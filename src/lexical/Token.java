@@ -1,7 +1,7 @@
 package lexical;
 
 public class Token {
-    public final Tag tag;
+    private final Tag tag;
 
     public Token(Tag tag) {
         this.tag = tag;
@@ -10,4 +10,9 @@ public class Token {
     public String toString() {
         return "" + this.tag.toString();
     }
+
+    public Tag getTag() {
+        return tag;
+    }
+
 }
