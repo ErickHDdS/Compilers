@@ -7,4 +7,8 @@ public class Lexer {
     private char ch = ' ';
     private FileReader file;
 
+    // TO DO:
+    // criar tabela de simbolos
+    // realizar a leitura de tokens
+
 }

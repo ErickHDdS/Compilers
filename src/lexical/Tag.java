@@ -7,47 +7,51 @@ public enum Tag {
     END_OF_FILE,
 
     // SYMBOLS
-    SEMI_COLON,     // ;
-    COMMA,          // ,
-    ASSIGN,         // =
-    DOT,            // .
-    APOSTROPHE,     // '
+    DOT, // .
+    SEMI_COLON, // ;
+    COMMA, // ,
+    OPEN_PAR, // (
+    CLOSE_PAR, // )
+    OPEN_KEY, // {
+    CLOSE_KEY, // }
 
     // OPERATORS
-    EQUALS,         // ==
-    NOT_EQUALS,     // !=
-    LOWER,          // <
-    GREATER,        // >
-    LOWER_EQ,       // <=
-    GREATER_EQ,     // >=
-    CONTAINS,       // ===
-    ADD,            // +
-    SUB,            // -
-    MUL,            // *
-    DIV,            // /
-    MOD,            // %
-    EXP,            // **
-    AND,            // &&
-    OR,             // ||
+    ASSIGN, // =
+    NOT, // !
+    EQUALS, // ==
+    GREATER, // >
+    GREATER_EQ, // >=
+    LOWER, // <
+    LOWER_EQ, // <=
+    NOT_EQUALS, // !=
+    ADD, // +
+    SUB, // -
+    OR, // ||
+    MUL, // *
+    DIV, // /
+    AND, // &&
+    UNDERLINE, // _
 
     // KEYWORDS
-    IF,             // if
-    THEN,           // then
-    ELSIF,          // elsif
-    ELSE,           // else
-    END,            // end
-    WHILE,          // while
-    DO,             // do
-    FOR,            // for
-    TRUE,           // true
-    FALSE,          // false
-    OPEN_BRA,       // [
-    CLOSE_BRA,      // ]
-    OPEN_PAR,       // (
-    CLOSE_PAR,      // )
+    PROGRAM, // program
+    BEGIN, // begin
+    END, // end
+    IS, // is
+    INT, // int
+    FLOAT, // float
+    CHAR, // char
+    IF, // if
+    ELSE, // else
+    THEN, // then
+    REPEAT, // repeat
+    UNTIL, // until
+    WHILE, // while
+    DO, // do
+    READ, // read
+    WRITE, // write
 
     // OTHERS
-    ID,             // identifier
-    NUMBER,         // number
-    STRING,         // string
+    ID, // identifier
+    NUMBER, // number
+    STRING, // string
 }

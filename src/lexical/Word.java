@@ -1,17 +1,13 @@
 package lexical;
 
-public class Word extends Token {
+public class Word {
 
-    private String lexeme = "";
+    public Token token;
+    public Tag type;
 
-    public static final Word and = new Word("&&", Tag.AND);
-
-    public Word(String s, Tag tag) {
-        super(tag);
-        lexeme = s;
+    public Word(Token token, Tag type) {
+        this.token = token;
+        this.type = type;
     }
 
-    public String toString() {
-        return "" + this.lexeme;
-    }
 }
