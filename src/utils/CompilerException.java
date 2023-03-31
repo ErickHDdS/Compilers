@@ -1,9 +1,9 @@
 package utils;
 
 public class CompilerException extends Exception {
-    public CompilerException(String message, String local, int line) {
+    public CompilerException(String message, int line) {
         super("Linha: " + line +
-                "\nErro ao processar: " + local +
+                "\nErro: " +
                 "\n" + message);
     }
 
