@@ -1,8 +1,8 @@
 package lexical;
 
-public class Word {
+public class Word extends Token {
 
-    private String token;
+    private String lexeme;
     private Tag type;
 
     // SYMBOLS
@@ -49,9 +49,28 @@ public class Word {
     public static final Word READ = new Word("read", Tag.READ);
     public static final Word WRITE = new Word("write", Tag.WRITE);
 
-    public Word(String token, Tag type) {
-        this.token = token;
-        this.type = type;
+    public Word(String lexeme, Tag type) {
+        super(type);
+        this.lexeme = lexeme;
     }
 
+    public String toString() {
+        return "" + this.lexeme;
+    }
+
+    public String getLexeme() {
+        return lexeme;
+    }
+
+    public void setLexeme(String lexeme) {
+        this.lexeme = lexeme;
+    }
+
+    public Tag getType() {
+        return type;
+    }
+
+    public void setType(Tag type) {
+        this.type = type;
+    }
 }

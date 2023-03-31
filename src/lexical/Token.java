@@ -1,6 +1,7 @@
 package lexical;
 
 public class Token {
+
     private final Tag tag;
 
     public Token(Tag tag) {

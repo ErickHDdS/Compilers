@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lexical.Tag;
+import lexical.Word;
 
 public class Table {
     private Map<String, Tag> table;
@@ -63,5 +64,9 @@ public class Table {
 
     public boolean containsString(String str) {
         return this.table.containsKey(str);
+    }
+
+    public void put(String lexeme, Tag tag) {
+        this.table.put(lexeme, tag);
     }
 }

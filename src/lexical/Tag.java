@@ -5,6 +5,7 @@ public enum Tag {
     UNEXPECTED_EOF,
     INVALID_TOKEN,
     END_OF_FILE,
+    NOT_EXPECTED,
 
     // SYMBOLS
     DOT, // .
@@ -53,5 +54,5 @@ public enum Tag {
     // OTHERS
     ID, // identifier
     NUMBER, // number
-    STRING, // string
+    LITERAL, // literal
 }
