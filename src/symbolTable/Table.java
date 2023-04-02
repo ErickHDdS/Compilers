@@ -18,8 +18,8 @@ public class Table {
         this.table.put(",", Tag.COMMA);
         this.table.put("(", Tag.OPEN_PAR);
         this.table.put(")", Tag.CLOSE_PAR);
-        this.table.put("{", Tag.OPEN_KEY);
-        this.table.put("}", Tag.CLOSE_KEY);
+        this.table.put("{", Tag.OPEN_BRACKET);
+        this.table.put("}", Tag.CLOSE_BRACKET);
 
         // OPERATORS
         this.table.put("=", Tag.ASSIGN);

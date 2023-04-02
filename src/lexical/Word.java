@@ -3,16 +3,16 @@ package lexical;
 public class Word extends Token {
 
     private String lexeme;
-    private Tag type;
 
     // SYMBOLS
     public static final Word DOT = new Word(".", Tag.DOT);
     public static final Word SEMI_COLON = new Word(";", Tag.SEMI_COLON);
+    public static final Word COLON = new Word(":", Tag.COLON);
     public static final Word COMMA = new Word(",", Tag.COMMA);
     public static final Word OPEN_PAR = new Word("(", Tag.OPEN_PAR);
     public static final Word CLOSE_PAR = new Word(")", Tag.CLOSE_PAR);
-    public static final Word OPEN_KEY = new Word("{", Tag.OPEN_KEY);
-    public static final Word CLOSE_KEY = new Word("}", Tag.CLOSE_KEY);
+    public static final Word OPEN_BRACKET = new Word("{", Tag.OPEN_BRACKET);
+    public static final Word CLOSE_BRACKET = new Word("}", Tag.CLOSE_BRACKET);
 
     // OPERATORS
     public static final Word ASSIGN = new Word("=", Tag.ASSIGN);
@@ -55,7 +55,7 @@ public class Word extends Token {
     }
 
     public String toString() {
-        return "" + this.lexeme;
+        return "lexeme: " + this.lexeme + "  tag:" + this.getTag();
     }
 
     public String getLexeme() {
@@ -66,11 +66,11 @@ public class Word extends Token {
         this.lexeme = lexeme;
     }
 
-    public Tag getType() {
-        return type;
-    }
+    // public Tag getType() {
+    //     return type;
+    // }
 
-    public void setType(Tag type) {
-        this.type = type;
-    }
+    // public void setType(Tag type) {
+    //     this.type = type;
+    // }
 }

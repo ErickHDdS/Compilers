@@ -7,7 +7,7 @@ import lexical.Token;
 
 public class Test {
 	public static void main(String[] args) throws Exception {
-        String filePath = "./programs/teste1";
+        String filePath = "./programs/teste5";
         
         Lexer lexer = new Lexer(filePath);
         Token token;
@@ -19,10 +19,10 @@ public class Test {
         } while (token.getTag() != Tag.END_OF_FILE);
 
 		// debug symbolTable
-		for (Entry<String, Tag> entry : lexer.words.table.entrySet()) {
-            String key = entry.getKey();
-            Tag value = entry.getValue();
-            System.out.println("Chave: " + key + ", Valor: " + value);
-        }
+		// for (Entry<String, Tag> entry : lexer.words.table.entrySet()) {
+        //     String key = entry.getKey();
+        //     Tag value = entry.getValue();
+        //     System.out.println("Chave: " + key + ", Valor: " + value);
+        // }
     }
 }
