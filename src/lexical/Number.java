@@ -1,9 +1,9 @@
 package lexical;
 
 public class Number extends Token {
-    public final int value;
+    public final float value;
 
-    public Number(int value) {
+    public Number(float value) {
         super(Tag.NUMBER);
         this.value = value;
     }

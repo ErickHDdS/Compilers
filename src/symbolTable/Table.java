@@ -7,7 +7,7 @@ import lexical.Tag;
 import lexical.Word;
 
 public class Table {
-    private Map<String, Tag> table;
+    public Map<String, Tag> table;
 
     public Table() {
         this.table = new HashMap<String, Tag>();

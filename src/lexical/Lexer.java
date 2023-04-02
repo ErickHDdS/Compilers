@@ -16,7 +16,7 @@ public class Lexer {
     private char currentChar = ' '; // caractere lido do arquivo
     private FileReader file; // arquivo fonte
 
-    private Table words = new Table();
+    public Table words = new Table();
 
     /* Método para inserir palavras reservadas na tabela de símbolos */
     private void reserve(Word w) {
@@ -64,27 +64,23 @@ public class Lexer {
         }
 
         // NUMBERS
-        if (Character.isDigit(this.currentChar)) {
-            boolean isIntegerValue = true;
-            int decimalValue = 0;
-            int integerValue = 0;
-            int dividerDecimalValue = TEN;
-            do {
-                if (isIntegerValue) {
-                    integerValue = TEN * integerValue + Character.digit(this.currentChar, integerValue);
-                } else {
-                    decimalValue = integerValue
-                            + (Character.digit(this.currentChar, integerValue) / dividerDecimalValue);
-                    dividerDecimalValue *= TEN;
+        if (Character.isDigit(currentChar)) {
+            StringBuilder lexeme = new StringBuilder();
+            boolean isFloat = false;
+            
+            while (Character.isDigit(currentChar) || currentChar == '.') {
+                lexeme.append((char) currentChar);
+                if (currentChar == '.') {
+                    isFloat = true;
                 }
-
-                if (readCurrentChar('.')) {
-                    isIntegerValue = false;
-                }
-
-            } while (Character.isDigit(this.currentChar));
-
-            return new Number(integerValue + decimalValue);
+                readCurrentChar();
+            }
+            
+            if (isFloat) {
+                return new Number(Float.parseFloat(lexeme.toString()));
+            } else {
+                return new Number(Integer.parseInt(lexeme.toString()));
+            }
         }
 
         // IDENTIFIERS
@@ -170,9 +166,12 @@ public class Lexer {
             case '.':
                 readCurrentChar();
                 return new Token(Tag.DOT);
-            case ';':
+            case ',':
                 readCurrentChar();
                 return new Token(Tag.COMMA);
+            case ';':
+                readCurrentChar();
+                return new Token(Tag.SEMI_COLON);
             case '(':
                 readCurrentChar();
                 return new Token(Tag.OPEN_PAR);
@@ -203,6 +202,7 @@ public class Lexer {
         this.currentChar = ' ';
         return t;
     }
+    
     // TO DO:
     // realizar a leitura de tokens
 
