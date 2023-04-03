@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lexical.Tag;
-import lexical.Word;
 
 public class Table {
     public Map<String, Tag> table;

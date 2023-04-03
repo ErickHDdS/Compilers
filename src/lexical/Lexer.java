@@ -1,6 +1,5 @@
 package lexical;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,9 +17,9 @@ public class Lexer {
     public Table words = new Table();
 
     /* Método para inserir palavras reservadas na tabela de símbolos */
-    private void reserve(Word w) {
-        words.put(w.getLexeme(), w.getTag());
-    }
+    // private void reserve(Word w) {
+    // words.put(w.getLexeme(), w.getTag());
+    // }
 
     public Lexer(String file) throws FileNotFoundException {
         try {
@@ -29,7 +28,6 @@ public class Lexer {
             System.out.println("Arquivo não encontrado.");
             throw e;
         }
-
     }
 
     /* Lê o próximo caractere do arquivo */
@@ -67,7 +65,7 @@ public class Lexer {
             StringBuilder lexeme = new StringBuilder();
             boolean isFloat = false;
             boolean hasDot = false;
-            
+
             while (Character.isDigit(currentChar) || currentChar == '.') {
                 lexeme.append((char) currentChar);
 
@@ -75,10 +73,10 @@ public class Lexer {
                     readCurrentChar();
                     hasDot = true;
 
-                    if(Character.isDigit(currentChar)) {
+                    if (Character.isDigit(currentChar)) {
                         isFloat = true;
                     }
-                }else {
+                } else {
                     readCurrentChar();
                 }
             }
@@ -86,10 +84,10 @@ public class Lexer {
             if (isFloat) {
                 return new Number(Float.parseFloat(lexeme.toString()), Tag.CONST_FLOAT);
             } else {
-                if(hasDot) {
+                if (hasDot) {
                     return new Token(Tag.INVALID_TOKEN);
                 }
-                return new Number(Integer.parseInt(lexeme.toString()),  Tag.CONST_INT);
+                return new Number(Integer.parseInt(lexeme.toString()), Tag.CONST_INT);
             }
         }
 
@@ -159,16 +157,15 @@ public class Lexer {
                         if (currentChar == '*')
                             if (readCurrentChar('/'))
                                 comment = false;
-                        
+
                         if (currentChar == (char) EOF) {
                             throw new CompilerException("Comentário aberto.", line);
-                            // return new Token(Tag.END_OF_FILE);
                         }
                     }
                     return scan();
                 }
-                
-                if (currentChar == '/'){
+
+                if (currentChar == '/') {
                     readCurrentChar();
                     boolean comment = true;
 
@@ -179,7 +176,7 @@ public class Lexer {
                     }
                     return scan();
                 }
-                
+
                 return new Token(Tag.DIV);
             case '&':
                 if (readCurrentChar('&'))
@@ -208,10 +205,9 @@ public class Lexer {
                 readCurrentChar();
                 return new Token(Tag.OPEN_PAR);
 
-                
             case ')':
                 readCurrentChar();
-                return new Token(Tag.CLOSE_PAR);       
+                return new Token(Tag.CLOSE_PAR);
 
             case '{':
                 Boolean readString = true;
@@ -230,18 +226,18 @@ public class Lexer {
                 String s = str.toString();
                 readCurrentChar();
                 return new Word(s, Tag.LITERAL);
-                
+
         }
 
-        if (currentChar == '\''){
+        if (currentChar == '\'') {
             readCurrentChar();
-            if(Character.isLetter(currentChar)){
+            if (Character.isLetter(currentChar)) {
                 char value = currentChar;
                 readCurrentChar();
-                if(currentChar == '\''){
+                if (currentChar == '\'') {
                     currentChar = ' ';
                     return new Word(Character.toString(value), Tag.CONST_CHAR);
-                }else {
+                } else {
                     Token t = new Token(Tag.NOT_EXPECTED);
                     return t;
                 }
@@ -249,7 +245,7 @@ public class Lexer {
         }
 
         // EOF
-        if(this.currentChar == ((char) EOF)){
+        if (this.currentChar == ((char) EOF)) {
             return new Token(Tag.END_OF_FILE);
         }
 
@@ -258,8 +254,4 @@ public class Lexer {
         this.currentChar = ' ';
         return t;
     }
-    
-    // TO DO:
-    // realizar a leitura de tokens
-
 }

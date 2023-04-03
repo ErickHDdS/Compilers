@@ -65,12 +65,4 @@ public class Word extends Token {
     public void setLexeme(String lexeme) {
         this.lexeme = lexeme;
     }
-
-    // public Tag getType() {
-    //     return type;
-    // }
-
-    // public void setType(Tag type) {
-    //     this.type = type;
-    // }
 }
