@@ -12,9 +12,9 @@ public class Number extends Token {
         Tag tag = this.getTag();
 
         if (tag == Tag.CONST_INT) {
-            return "Value: " + (int) value + " Tag: " + this.getTag();
+            return "Value: " + (int) value + " | Tag: " + this.getTag();
         }
-        return "Value: " + this.value + " Tag: " + this.getTag();
+        return "Value: " + this.value + " | Tag: " + this.getTag();
     }
 
 }
