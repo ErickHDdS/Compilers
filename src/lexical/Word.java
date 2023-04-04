@@ -55,7 +55,7 @@ public class Word extends Token {
     }
 
     public String toString() {
-        return "lexeme: " + this.lexeme + "  tag:" + this.getTag();
+        return "Lexeme: " + this.lexeme + " Tag:" + this.getTag();
     }
 
     public String getLexeme() {
