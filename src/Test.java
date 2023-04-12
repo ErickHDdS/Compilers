@@ -1,29 +1,21 @@
 import java.io.FileNotFoundException;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Map.Entry;
 
 import lexical.Lexer;
 import lexical.Tag;
 import lexical.Token;
+import utils.CompilerException;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        Scanner input = new Scanner(System.in);
+        // Scanner input = new Scanner(System.in);
 
-        String fileName;
+        String fileName = args[0];
 
-        while (true) {
-            System.out.println("\nDigite o nome do programa: \nCRTL + C para encerrar.\n");
-            fileName = input.nextLine();
-            String filePath;
             Lexer lexer;
             Token token;
 
             try {
-                filePath = "../programs/" + fileName;
-                lexer = new Lexer(filePath);
-                // run scan from init file to EOF
+                lexer = new Lexer(fileName);
                 do {
                     token = lexer.scan();
                     System.out.println(token.toString() + " ");
@@ -38,7 +30,9 @@ public class Test {
             } catch (FileNotFoundException e) {
                 System.out.println("Insira o nome de um arquivo válido.");
             }
+            catch (CompilerException e) {
+                System.out.println(e);
+            }
 
-        }
     }
 }
