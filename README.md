@@ -9,6 +9,9 @@ $ cd src
 $ javac Test.java
 $ java Test
 ```
+### Requerimentos
+
+* Java 11 ou superior
 
 ## Realizado por:
 
