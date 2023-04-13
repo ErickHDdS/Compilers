@@ -1,4 +1,5 @@
 # Compilador em Java
+
 Este repositório contém um compilador Java para uma linguagem de programação especificada. A linguagem de programação é definida pela gramática abaixo:
 
 ```
@@ -77,8 +78,8 @@ identifier ::= letter (letter | digit | " _")*
 letter ::= [A-Za-z]
 ```
 
-
 ## Funcionalidades
+
 O compilador implementado neste repositório é capaz de realizar as seguintes funcionalidades:
 
 - [x] Análise léxica
@@ -87,13 +88,14 @@ O compilador implementado neste repositório é capaz de realizar as seguintes f
 - [ ] Geração de código
 
 ## Como utilizar
+
 Para utilizar o compilador, siga os passos abaixo:
 
 1. Clone este repositório em sua máquina local.
 2. Abra o terminal e navegue até o diretório onde o repositório foi clonado.
-3. Entre na pasta src ```cd src/```
-3. Compile o código-fonte utilizando o comando ```javac Compiler.java ```
-4. Execute o compilador utilizando o comando ``` java Compiler <file> ```
+3. Entre na pasta src `cd src/`
+4. Compile o código-fonte utilizando o comando `javac Compiler.java `
+5. Execute o compilador utilizando o comando `java Compiler <file-path>`
 
 ## Realizado por:
 
