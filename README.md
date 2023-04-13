@@ -84,18 +84,16 @@ O compilador implementado neste repositório é capaz de realizar as seguintes f
 - [x] Análise léxica
 - [ ] Análise sintática
 - [ ] Análise semântica
-- [ ] Geração de código intermediário
-- [ ] Otimização de código
-- [ ] Geração de código objeto para uma máquina virtual
+- [ ] Geração de código
 
 ## Como utilizar
 Para utilizar o compilador, siga os passos abaixo:
 
 1. Clone este repositório em sua máquina local.
 2. Abra o terminal e navegue até o diretório onde o repositório foi clonado.
-3. Entre na pasta src: ```cd src/```
+3. Entre na pasta src ```cd src/```
 3. Compile o código-fonte utilizando o comando ```javac Compiler.java ```
-4. Execute o compilador utilizando o comando ``` java Compiler <arquivo-de-entrada> ```
+4. Execute o compilador utilizando o comando ``` java Compiler <file> ```
 
 ## Realizado por:
 
