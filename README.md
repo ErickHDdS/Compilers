@@ -6,12 +6,13 @@
 
 ```bash
 $ cd src
-$ javac Test.java
-$ java Test
+$ javac Compiler.java
+$ java Compiler
 ```
+
 ### Requerimentos
 
-* Java 11 ou superior
+- Java 11 ou superior
 
 ## Realizado por:
 

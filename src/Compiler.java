@@ -5,7 +5,7 @@ import lexical.Tag;
 import lexical.Token;
 import utils.CompilerException;
 
-public class Test {
+public class Compiler {
     public static void main(String[] args) throws Exception {
         // Scanner input = new Scanner(System.in);
 
@@ -21,12 +21,6 @@ public class Test {
                 System.out.println(token.toString() + " ");
             } while (token.getTag() != Tag.END_OF_FILE);
 
-            // debug symbolTable
-            // for (Entry<String, Tag> entry : lexer.words.table.entrySet()) {
-            // String key = entry.getKey();
-            // Tag value = entry.getValue();
-            // System.out.println("Chave: " + key + ", Valor: " + value);
-            // }
         } catch (FileNotFoundException e) {
             System.out.println("Insira o nome de um arquivo válido.");
         } catch (CompilerException e) {
