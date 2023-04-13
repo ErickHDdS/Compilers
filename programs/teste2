@@ -1,7 +1,7 @@
 program teste2
 
         a, b, c:int;
-        d, _var: float;
+        d, var_: float;
         
     teste2 = 1;
     Read (a);

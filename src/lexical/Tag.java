@@ -10,11 +10,12 @@ public enum Tag {
     // SYMBOLS
     DOT, // .
     SEMI_COLON, // ;
+    COLON, // :
     COMMA, // ,
     OPEN_PAR, // (
     CLOSE_PAR, // )
-    OPEN_KEY, // {
-    CLOSE_KEY, // }
+    OPEN_BRACKET, // {
+    CLOSE_BRACKET, // }
 
     // OPERATORS
     ASSIGN, // =
@@ -53,6 +54,8 @@ public enum Tag {
 
     // OTHERS
     ID, // identifier
-    NUMBER, // number
+    CONST_INT, // number
+    CONST_FLOAT, // number
+    CONST_CHAR, // number
     LITERAL, // literal
 }

@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lexical.Tag;
-import lexical.Word;
 
 public class Table {
-    private Map<String, Tag> table;
+    public Map<String, Tag> table;
 
     public Table() {
         this.table = new HashMap<String, Tag>();
@@ -18,8 +17,8 @@ public class Table {
         this.table.put(",", Tag.COMMA);
         this.table.put("(", Tag.OPEN_PAR);
         this.table.put(")", Tag.CLOSE_PAR);
-        this.table.put("{", Tag.OPEN_KEY);
-        this.table.put("}", Tag.CLOSE_KEY);
+        this.table.put("{", Tag.OPEN_BRACKET);
+        this.table.put("}", Tag.CLOSE_BRACKET);
 
         // OPERATORS
         this.table.put("=", Tag.ASSIGN);

@@ -1,6 +1,6 @@
-# **Lexical Analyzer**
+# **Utils**
 
-> Implementação do analisador léxico.
+> Implementação de classes utilitárias para todo o compilador.
 
 ## Realizado por:
 

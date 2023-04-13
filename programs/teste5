@@ -26,9 +26,9 @@ begin
                 maior = c
             end
         end;
-        write({Maior valor:}});
+        write({Maior valor:});
         write (maior);
         write ({Outro? (S/N)});
         read(outro);
-    until (outro == 'N' || outro == 'n)
+    until (outro == 'N' || outro == 'n')
 end
