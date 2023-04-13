@@ -9,7 +9,7 @@ public class Compiler {
     public static void main(String[] args) throws Exception {
         // Scanner input = new Scanner(System.in);
 
-        String fileName = "../programs/" + args[0];
+        String fileName = args[0];
 
         Lexer lexer;
         Token token;
