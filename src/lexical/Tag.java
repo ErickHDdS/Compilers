@@ -16,6 +16,7 @@ public enum Tag {
     CLOSE_PAR, // )
     OPEN_BRACKET, // {
     CLOSE_BRACKET, // }
+    SINGLE_QUOTE, // '
 
     // OPERATORS
     ASSIGN, // =
