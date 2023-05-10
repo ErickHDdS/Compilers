@@ -11,15 +11,11 @@ public class Lexer {
     private static final int EOF = 65535;
 
     public static int line = 1; // contador de linhas
+
     private char currentChar = ' '; // caractere lido do arquivo
     private FileReader file; // arquivo fonte
 
     public Table words = new Table();
-
-    /* Método para inserir palavras reservadas na tabela de símbolos */
-    // private void reserve(Word w) {
-    // words.put(w.getLexeme(), w.getTag());
-    // }
 
     public Lexer(String file) throws FileNotFoundException {
         try {
@@ -253,5 +249,9 @@ public class Lexer {
         Token t = new Token(Tag.NOT_EXPECTED);
         this.currentChar = ' ';
         return t;
+    }
+
+    public static int getLine() {
+        return line;
     }
 }
