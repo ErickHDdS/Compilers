@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import lexical.Lexer;
 import lexical.Tag;
 import lexical.Token;
+import syntatic.Parser;
 import utils.CompilerException;
 
 public class Compiler {
@@ -13,13 +14,17 @@ public class Compiler {
 
         Lexer lexer;
         Token token;
+        Parser parser;
 
         try {
             lexer = new Lexer(fileName);
+            parser = new Parser(lexer);
             do {
-                token = lexer.scan();
-                System.out.println(token.toString() + " ");
-            } while (token.getTag() != Tag.END_OF_FILE);
+                // token = lexer.scan();
+                // System.out.println(token.toString() + " ");
+                parser.programLine();
+
+            } while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
 
         } catch (FileNotFoundException e) {
             System.out.println("Insira o nome de um arquivo válido.");
