@@ -8,18 +8,35 @@ import utils.CompilerException;
 public class Parser {
     private Token currentToken;
     private Token lastToken;
+    private Token nexToken;
+
+    public void lancarThrow(String message) throws Exception {
+        throw new CompilerException(message, this.lexer.getLine());
+    }
+
+    public Token getCurrentToken() {
+        return currentToken;
+    }
+
     private Lexer lexer;
+    private int count = 1;
+
+    public Parser(Lexer lexer) throws Exception {
+        this.lexer = lexer;
+        advance();
+    }
 
     private void advance() throws Exception {
         this.currentToken = this.lexer.scan();
     }
 
     private void eat(Tag tag) throws Exception {
-        if (currentToken.getTag() == tag) {
-            System.out.println("EAT: " + this.currentToken.toString());
+        if (this.currentToken.getTag().toString().equals(tag.toString())) {
+            System.out.println(this.currentToken.toString());
             advance();
         } else {
-            throw new CompilerException("Erro na leitura do token: " + this.currentToken.toString(),
+            throw new CompilerException("(EAT) Erro na leitura do token: " +
+                    this.currentToken.toString() + "\n Token esperado: " + tag.toString(),
                     this.lexer.getLine());
         }
     }
@@ -30,23 +47,34 @@ public class Parser {
         eat(Tag.END_OF_FILE);
     }
 
-    // program ::= program identifier begin [decl-list] stmt-list end "."
+    // program ::= program identifier begin [decl-list] stmt-list end ". // TO DO:
+    // VALIDAR REGRA DE REPETIÇÃO
     public void program() throws Exception {
         eat(Tag.PROGRAM);
         identifier();
         eat(Tag.BEGIN);
-        declList(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 0, 1 OU N VEZES
+        declList();
         stmtList();
         eat(Tag.END);
         eat(Tag.DOT);
     }
 
-    // decl-list ::= decl ";" { decl ";"}
-    public void declList() throws Exception {
+    public boolean isDeclListLoop() {
+        String currentToken = this.currentToken.getTag().toString();
+        return currentToken.equals(Tag.ID.toString()) || currentToken.equals(Tag.INT.toString())
+                || currentToken.equals(Tag.UNDERLINE.toString());
+    }
+
+    public void declListLine() throws Exception {
         decl();
         eat(Tag.SEMI_COLON);
-        declList(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
-        eat(Tag.SEMI_COLON); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+    }
+
+    // decl-list ::= decl ";" { decl ";"} // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    public void declList() throws Exception {
+        while (isDeclListLoop()) {
+            declListLine();
+        }
     }
 
     // decl ::= ident-list is type
@@ -56,11 +84,25 @@ public class Parser {
         type();
     }
 
-    // ident-list ::= identifier {"," identifier}
+    public boolean isIdentListLoop() {
+        String currentToken = this.currentToken.getTag().toString();
+
+        return currentToken.equals(Tag.COMMA.toString());
+    }
+
+    public void identListLine() throws Exception {
+        eat(Tag.COMMA);
+        identifier();
+    }
+
+    // ident-list ::= identifier {"," identifier} // TO DO: VALIDAR REGRA DE
+    // REPETIÇÃO
     public void identList() throws Exception {
         identifier();
-        eat(Tag.COMMA); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
-        identifier(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+
+        while (isIdentListLoop()) {
+            identListLine();
+        }
     }
 
     // type ::= int | float | char
@@ -72,20 +114,38 @@ public class Parser {
             case FLOAT:
                 eat(Tag.FLOAT);
                 break;
-            case CHAR:
-                eat(Tag.CHAR);
+            case ID:
+                eat(Tag.ID);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(TYPE) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
 
-    // stmt-list ::= stmt {";" stmt}
+    public boolean isStmtListLoop() {
+        String currentToken = this.currentToken.getTag().toString();
+        return currentToken.equals(Tag.SEMI_COLON.toString());
+    }
+
+    public void stmtListLine() throws Exception {
+        eat(Tag.SEMI_COLON);
+        stmt();
+    }
+
+    // stmt-list ::= stmt {";" stmt} // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void stmtList() throws Exception {
         stmt();
-        eat(Tag.SEMI_COLON); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
-        stmt(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+
+        boolean condition = isStmtListLoop();
+        if (!condition) {
+            throw new CompilerException("(STMT_LIST) Expressão mal formatada: " + this.currentToken.toString(),
+                    this.lexer.getLine());
+        }
+
+        while (isStmtListLoop()) {
+            stmtListLine();
+        }
     }
 
     // stmt ::= assign-stmt | if-stmt | while-stmt | repeat-stmt | read-stmt |
@@ -111,7 +171,7 @@ public class Parser {
                 writeStmt();
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(STMT) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -144,7 +204,7 @@ public class Parser {
                 eat(Tag.END);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(IF_STMT_LINE) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -202,7 +262,7 @@ public class Parser {
     public void writable() throws Exception {
         switch (this.currentToken.getTag()) {
             case ID:
-            case CONST_INT:
+            case INT:
             case SINGLE_QUOTE:
             case OPEN_PAR:
             case NOT:
@@ -213,7 +273,7 @@ public class Parser {
                 literal();
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(WRITABLE) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -240,7 +300,7 @@ public class Parser {
     public void simpleExprLine() throws Exception {
         switch (this.currentToken.getTag()) {
             case ID:
-            case CONST_INT:
+            case INT:
             case SINGLE_QUOTE:
             case OPEN_PAR:
             case NOT:
@@ -264,7 +324,7 @@ public class Parser {
     public void termLine() throws Exception {
         switch (this.currentToken.getTag()) {
             case ID:
-            case CONST_INT:
+            case INT:
             case SINGLE_QUOTE:
             case OPEN_PAR:
             case NOT:
@@ -282,7 +342,7 @@ public class Parser {
     public void factorA() throws Exception {
         switch (this.currentToken.getTag()) {
             case ID:
-            case CONST_INT:
+            case INT:
             case SINGLE_QUOTE:
             case OPEN_PAR:
                 factor();
@@ -296,7 +356,7 @@ public class Parser {
                 factor();
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(FACTOR-A) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -307,7 +367,7 @@ public class Parser {
             case ID:
                 identifier();
                 break;
-            case CONST_INT:
+            case INT:
                 constant();
                 break;
             case OPEN_PAR:
@@ -316,7 +376,7 @@ public class Parser {
                 eat(Tag.CLOSE_PAR);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(FACTOR) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -343,7 +403,7 @@ public class Parser {
                 eat(Tag.NOT_EQUALS);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(RELOP) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -361,7 +421,7 @@ public class Parser {
                 eat(Tag.OR);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(ADDOP) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -379,7 +439,7 @@ public class Parser {
                 eat(Tag.AND);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(MULOP) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
@@ -397,41 +457,81 @@ public class Parser {
                 eat(Tag.CONST_CHAR);
                 break;
             default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+                throw new CompilerException("(CONSTANT) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
     }
 
     // digit ::= [0-9]
     public void digit() throws Exception {
-        eat(Tag.CONST_INT);
+        eat(Tag.INT);
     }
 
     // carac ::= um dos caracteres ASCII
     public void carac() throws Exception {
-        eat(Tag.CONST_CHAR);
+        eat(Tag.ID);
     }
 
     // caractere ::= um dos caracteres ASCII, exceto quebra de linha
     public void caractere() throws Exception {
         if (this.currentToken.toString() == "\n") {
-            throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
+            throw new CompilerException("(CARACTERE) Token não esperado: " + this.currentToken.toString(),
                     this.lexer.getLine());
         } else {
-            eat(Tag.CONST_CHAR);
+            eat(Tag.ID);
         }
     }
 
-    // integer_const ::= digit+
-    public void integerConst() throws Exception {
-        digit(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+    public boolean isIntegerConst() {
+        String currentToken = this.currentToken.getTag().toString();
+        return currentToken.equals(Tag.INT.toString());
     }
 
-    // float_const ::= digit+ "." digit+
+    public void integerConstLine() throws Exception {
+        digit();
+    }
+
+    // integer_const ::= digit+ // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    public void integerConst() throws Exception {
+
+        boolean condition = isIntegerConst();
+        if (!condition) {
+            throw new CompilerException("(INTEGER_CONST) Inteiro mal formatado: " + this.currentToken.toString(),
+                    this.lexer.getLine());
+        }
+
+        while (isIntegerConst()) {
+            integerConstLine();
+        }
+    }
+
+    // float_const ::= digit+ "." digit+ // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void floatConst() throws Exception {
-        digit(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+        boolean condition;
+
+        condition = isIntegerConst();
+        if (!condition) {
+            throw new CompilerException(
+                    "(FLOAT_CONST) Decimal (parte inteira) mal formatado: " + this.currentToken.toString(),
+                    this.lexer.getLine());
+        }
+
+        while (isIntegerConst()) {
+            integerConstLine();
+        }
+
         eat(Tag.DOT);
-        digit(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 1 OU N VEZES
+
+        condition = isIntegerConst();
+        if (!condition) {
+            throw new CompilerException(
+                    "(FLOAT_CONST) Decimal (parte fracionada) mal formatado: " + this.currentToken.toString(),
+                    this.lexer.getLine());
+        }
+
+        while (isIntegerConst()) {
+            integerConstLine();
+        }
     }
 
     // char_const ::= "'" carac "'"
@@ -441,34 +541,65 @@ public class Parser {
         eat(Tag.SINGLE_QUOTE);
     }
 
-    // literal ::= "{" caractere* "}"
+    public boolean isCaractere() {
+        String currentToken = this.currentToken.getTag().toString();
+        return currentToken.equals(Tag.ID.toString());
+    }
+
+    public void caractereLine() throws Exception {
+        caractere();
+    }
+
+    // literal ::= "{" caractere* "}" // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void literal() throws Exception {
         eat(Tag.OPEN_BRACKET);
-        caractere(); // TO DO: TRATAR ESSE ARGUMENTO PARA SER LIDO, 0, 1 OU N VEZES
+
+        while (isCaractere()) {
+            caractereLine();
+        }
+
         eat(Tag.CLOSE_BRACKET);
     }
 
-    // identifier ::= letter (letter | digit | "_")*
-    public void identifier() throws Exception {
-        letter();
+    // public boolean isIdentifier() {
+    // String currentToken = this.currentToken.getTag().toString();
+    // return currentToken.equals(Tag.ID.toString()) ||
+    // currentToken.equals(Tag.INT.toString())
+    // || currentToken.equals(Tag.UNDERLINE.toString());
+    // }
 
-        switch (this.currentToken.getTag()) { // TO DO: TRATAR ESSE SWITCH PARA SER LIDO, 0, 1 OU N VEZES
-            case ID:
-                letter();
-                break;
-            case CONST_INT:
-                digit();
-                break;
-            case UNDERLINE:
-                eat(Tag.UNDERLINE);
-                break;
-            default:
-                throw new CompilerException("Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
-        }
+    // public void identifierLine() throws Exception {
+    // switch (this.currentToken.getTag()) {
+    // case ID:
+    // letter();
+    // break;
+    // case INT:
+    // digit();
+    // break;
+    // case UNDERLINE:
+    // eat(Tag.UNDERLINE);
+    // break;
+    // default:
+    // throw new CompilerException("(IDENTIFIER_LINE) Token não esperado: " +
+    // this.currentToken.toString(),
+    // this.lexer.getLine());
+    // }}
+
+    // identifier ::= letter (letter | digit | "_")* // TO DO: VALIDAR REGRA DE
+    // REPETIÇÃO
+    public void identifier() throws Exception {
+        eat(Tag.ID);
+
+        // TO DO: O ANALISADOR LÉXIDO ESTÁ LENDO O IDENTIFICADOR DIRETO
+        // letter();
+        // lancarThrow("li a letra");
+
+        // while (isIdentifier()) {
+        // identifierLine();
+        // }
     }
 
-    // letter ::= [A-Za-z]
+    // letter ::= [A-Za-z] // TO DO
     public void letter() throws Exception {
         eat(Tag.ID);
 
