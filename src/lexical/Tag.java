@@ -55,8 +55,8 @@ public enum Tag {
 
     // OTHERS
     ID, // identifier
-    CONST_INT, // number
-    CONST_FLOAT, // number
-    CONST_CHAR, // number
+    CONST_INT, // integer
+    CONST_FLOAT, // decimal
+    CONST_CHAR, // char
     LITERAL, // literal
 }
