@@ -10,7 +10,6 @@ public class Parser {
     private Token lastToken;
 
     private Lexer lexer;
-    private int count = 1;
 
     public void throwCompilerException(String message) throws Exception {
         throw new CompilerException(message, this.lexer.getLine());
@@ -53,20 +52,11 @@ public class Parser {
     // program ::= program identifier begin [decl-list] stmt-list end "."
     public void program() throws Exception {
         eat(Tag.PROGRAM);
-
         identifier();
-        
         eat(Tag.BEGIN);
-        
         declList();
-        
         stmtList();
-        
-        // throwCompilerException("token atual = " + this.currentToken.getTag().toString() + "    lastToken = "
-        //         + this.lastToken.getTag().toString());
-        
         eat(Tag.END);
-        
         eat(Tag.DOT);
     }
 
@@ -86,12 +76,10 @@ public class Parser {
     public void decl() throws Exception {
         try {
             identList();
-
             eat(Tag.IS);
             type();
-
         } catch (CompilerException e) {
-            throw new CompilerException("erro teste",
+            throw new CompilerException("(DECL) Token não esperado: " + this.currentToken.toString(),
                     this.lexer.getLine());
         }
     }
@@ -103,7 +91,6 @@ public class Parser {
         try {
             identifier();
             eat(Tag.COMMA);
-
             identList();
         } catch (CompilerException e) {
             return;
@@ -132,21 +119,20 @@ public class Parser {
     public void stmtList() throws Exception {
         try {
             stmt();
-            eat(Tag.SEMI_COLON);
+            if (this.currentToken.getTag() == Tag.SEMI_COLON) {
+                eat(Tag.SEMI_COLON);
+            }
             stmtList();
-
-        } catch(CompilerException e) {
-            throw new CompilerException("(STMT_LIST) Expressão mal formatada: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+        } catch (CompilerException e) {
+            return;
         }
     }
 
     // stmt ::= assign-stmt | if-stmt | while-stmt | repeat-stmt | read-stmt |
     // write-stmt
     public void stmt() throws Exception {
-
         // Tratamento para a saída de decl-list para stmt-list
-        if (lastToken != null && lastToken.getTag().toString().equals(Tag.ID.toString())) {
+        if (this.lastToken != null && this.lastToken.getTag().toString().equals(Tag.ID.toString())) {
             // assign-stmt ::= identifier(eat) "=" simple_expr
             eat(Tag.ASSIGN);
             simpleExpr();
@@ -171,14 +157,12 @@ public class Parser {
                 readStmt();
                 break;
             case WRITE:
-                
                 writeStmt();
                 break;
             default:
                 throw new CompilerException("(STMT) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
         }
-
     }
 
     // assign-stmt ::= identifier "=" simple_expr
@@ -243,7 +227,6 @@ public class Parser {
     public void stmtPrefix() throws Exception {
         eat(Tag.WHILE);
         condition();
-        throwCompilerException("saiu de condition");
         eat(Tag.DO);
     }
 
@@ -288,14 +271,24 @@ public class Parser {
     // expression ::= simple-expr expression’
     public void expression() throws Exception {
         simpleExpr();
-        System.out.println("saiu de simpleExpr");
-        expressionLine(); // problema ta aqui
+        expressionLine();
     }
 
     // expression’ ::= relop simple-expr
     public void expressionLine() throws Exception {
-        relop();
-        simpleExpr();
+        switch (this.currentToken.getTag()) {
+            case EQUALS:
+            case GREATER:
+            case GREATER_EQ:
+            case LOWER:
+            case LOWER_EQ:
+            case NOT_EQUALS:
+                relop();
+                simpleExpr();
+                break;
+            default:
+                break;
+        }
     }
 
     // simple-expr ::= term simple-expr’
@@ -438,8 +431,6 @@ public class Parser {
             case OR:
                 eat(Tag.OR);
                 break;
-            // case AND:
-            //     eat(Tag.AND);
             default:
                 throw new CompilerException("(ADDOP) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
@@ -448,7 +439,7 @@ public class Parser {
 
     // mulop ::= "*" | "/" | "&&"
     public void mulop() throws Exception {
-        
+
         switch (this.currentToken.getTag()) {
             case MUL:
                 eat(Tag.MUL);
@@ -576,6 +567,5 @@ public class Parser {
     // letter ::= [A-Za-z] // TO DO
     public void letter() throws Exception {
         eat(Tag.ID);
-
     }
 }

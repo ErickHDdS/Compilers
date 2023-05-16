@@ -16,9 +16,9 @@ begin
 
     while (pontuacao>0 && (pontuacao<=pontuacaoMaxima)) do
         if ((pontuação > pontuacaoMinima) && (disponibilidade==1)) then
-            write({Candidato aprovado.})
+            write({Candidato aprovado.});
         else
-            write({Candidato reprovado.})
+            write({Candidato reprovado.});
         end
             
         write({Pontuacao do candidato: });
@@ -26,4 +26,4 @@ begin
         write({Disponibilidade do candidato: });
         read(disponibilidade);
     end
-end
+end.
