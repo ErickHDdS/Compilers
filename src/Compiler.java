@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import lexical.Lexer;
 import lexical.Tag;
 import lexical.Token;
-import syntatic.Parser;
+import syntactic.Parser;
 import utils.CompilerException;
 
 public class Compiler {
