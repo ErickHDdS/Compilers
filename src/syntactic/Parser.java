@@ -8,9 +8,11 @@ import utils.CompilerException;
 public class Parser {
     private Token currentToken;
     private Token lastToken;
-    // private Token nexToken;
 
-    public void lancarThrow(String message) throws Exception {
+    private Lexer lexer;
+    private int count = 1;
+
+    public void throwCompilerException(String message) throws Exception {
         throw new CompilerException(message, this.lexer.getLine());
     }
 
@@ -18,8 +20,9 @@ public class Parser {
         return currentToken;
     }
 
-    private Lexer lexer;
-    private int count = 1;
+    public Token getLastToken() {
+        return lastToken;
+    }
 
     public Parser(Lexer lexer) throws Exception {
         this.lexer = lexer;
@@ -47,17 +50,23 @@ public class Parser {
         eat(Tag.END_OF_FILE);
     }
 
-    // program ::= program identifier begin [decl-list] stmt-list end "." // TO DO:
-    // VALIDAR REGRA DE REPETIÇÃO
+    // program ::= program identifier begin [decl-list] stmt-list end "."
     public void program() throws Exception {
         eat(Tag.PROGRAM);
+
         identifier();
+        
         eat(Tag.BEGIN);
+        
         declList();
+        
         stmtList();
-        lancarThrow("token atual = " + this.currentToken.getTag().toString() + "    lastToken = "
-                + this.lastToken.getTag().toString());
+        
+        // throwCompilerException("token atual = " + this.currentToken.getTag().toString() + "    lastToken = "
+        //         + this.lastToken.getTag().toString());
+        
         eat(Tag.END);
+        
         eat(Tag.DOT);
     }
 
@@ -234,6 +243,7 @@ public class Parser {
     public void stmtPrefix() throws Exception {
         eat(Tag.WHILE);
         condition();
+        throwCompilerException("saiu de condition");
         eat(Tag.DO);
     }
 
@@ -278,7 +288,8 @@ public class Parser {
     // expression ::= simple-expr expression’
     public void expression() throws Exception {
         simpleExpr();
-        expressionLine();
+        System.out.println("saiu de simpleExpr");
+        // expressionLine();
     }
 
     // expression’ ::= relop simple-expr
@@ -330,6 +341,7 @@ public class Parser {
             case OPEN_PAR:
             case NOT:
             case SUB:
+            case AND:
                 mulop();
                 factorA();
                 termLine();
@@ -426,6 +438,8 @@ public class Parser {
             case OR:
                 eat(Tag.OR);
                 break;
+            // case AND:
+            //     eat(Tag.AND);
             default:
                 throw new CompilerException("(ADDOP) Token não esperado: " + this.currentToken.toString(),
                         this.lexer.getLine());
@@ -434,6 +448,7 @@ public class Parser {
 
     // mulop ::= "*" | "/" | "&&"
     public void mulop() throws Exception {
+        
         switch (this.currentToken.getTag()) {
             case MUL:
                 eat(Tag.MUL);

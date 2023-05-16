@@ -7,4 +7,7 @@ public class CompilerException extends Exception {
                 "\n" + message);
     }
 
+    public String getMessage() {
+        return super.getMessage();
+    }
 }
