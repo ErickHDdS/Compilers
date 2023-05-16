@@ -289,7 +289,7 @@ public class Parser {
     public void expression() throws Exception {
         simpleExpr();
         System.out.println("saiu de simpleExpr");
-        // expressionLine();
+        expressionLine(); // problema ta aqui
     }
 
     // expression’ ::= relop simple-expr
