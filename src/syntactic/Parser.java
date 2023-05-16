@@ -61,18 +61,6 @@ public class Parser {
         eat(Tag.DOT);
     }
 
-    // public boolean isDeclListLoop() {
-    // String currentToken = this.currentToken.getTag().toString();
-    // return currentToken.equals(Tag.ID.toString()) ||
-    // currentToken.equals(Tag.INT.toString())
-    // || currentToken.equals(Tag.UNDERLINE.toString());
-    // }
-
-    // public void declListLine() throws Exception {
-    // decl();
-    // eat(Tag.SEMI_COLON);
-    // }
-
     // decl-list ::= decl ";" { decl ";"} // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void declList() throws Exception {
         lastToken = this.currentToken;
@@ -98,17 +86,6 @@ public class Parser {
                     this.lexer.getLine());
         }
     }
-
-    // public boolean isIdentListLoop() {
-    // String currentToken = this.currentToken.getTag().toString();
-
-    // return currentToken.equals(Tag.COMMA.toString());
-    // }
-
-    // public void identListLine() throws Exception {
-    // eat(Tag.COMMA);
-    // identifier();
-    // }
 
     // ident-list ::= identifier {"," identifier} // TO DO: VALIDAR REGRA DE
     // REPETIÇÃO
@@ -142,28 +119,16 @@ public class Parser {
         }
     }
 
-    public boolean isStmtListLoop() {
-        String currentToken = this.currentToken.getTag().toString();
-        return currentToken.equals(Tag.SEMI_COLON.toString());
-    }
-
-    public void stmtListLine() throws Exception {
-        eat(Tag.SEMI_COLON);
-        stmt();
-    }
-
     // stmt-list ::= stmt {";" stmt} // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void stmtList() throws Exception {
-        stmt();
+        try {
+            stmt();
+            eat(Tag.SEMI_COLON);
+            stmtList();
 
-        boolean condition = isStmtListLoop();
-        if (!condition) {
+        } catch(CompilerException e) {
             throw new CompilerException("(STMT_LIST) Expressão mal formatada: " + this.currentToken.toString(),
                     this.lexer.getLine());
-        }
-
-        while (isStmtListLoop()) {
-            stmtListLine();
         }
     }
 
@@ -176,6 +141,7 @@ public class Parser {
             // assign-stmt ::= identifier(eat) "=" simple_expr
             eat(Tag.ASSIGN);
             simpleExpr();
+            lastToken = null;
             return;
         }
 
@@ -196,6 +162,7 @@ public class Parser {
                 readStmt();
                 break;
             case WRITE:
+                
                 writeStmt();
                 break;
             default:
@@ -299,7 +266,7 @@ public class Parser {
             case SUB:
                 simpleExpr();
                 break;
-            case OPEN_BRACKET:
+            case LITERAL:
                 literal();
                 break;
             default:
@@ -580,49 +547,10 @@ public class Parser {
         eat(Tag.SINGLE_QUOTE);
     }
 
-    public boolean isCaractere() {
-        String currentToken = this.currentToken.getTag().toString();
-        return currentToken.equals(Tag.ID.toString());
-    }
-
-    public void caractereLine() throws Exception {
-        caractere();
-    }
-
     // literal ::= "{" caractere* "}" // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void literal() throws Exception {
-        eat(Tag.OPEN_BRACKET);
-
-        while (isCaractere()) {
-            caractereLine();
-        }
-
-        eat(Tag.CLOSE_BRACKET);
+        eat(Tag.LITERAL);
     }
-
-    // public boolean isIdentifier() {
-    // String currentToken = this.currentToken.getTag().toString();
-    // return currentToken.equals(Tag.ID.toString()) ||
-    // currentToken.equals(Tag.INT.toString())
-    // || currentToken.equals(Tag.UNDERLINE.toString());
-    // }
-
-    // public void identifierLine() throws Exception {
-    // switch (this.currentToken.getTag()) {
-    // case ID:
-    // letter();
-    // break;
-    // case INT:
-    // digit();
-    // break;
-    // case UNDERLINE:
-    // eat(Tag.UNDERLINE);
-    // break;
-    // default:
-    // throw new CompilerException("(IDENTIFIER_LINE) Token não esperado: " +
-    // this.currentToken.toString(),
-    // this.lexer.getLine());
-    // }}
 
     // identifier ::= letter (letter | digit | "_")* // TO DO: VALIDAR REGRA DE
     // REPETIÇÃO
