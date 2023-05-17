@@ -9,6 +9,8 @@ public class Parser {
     private Token currentToken;
     private Token lastToken;
 
+    private Tag lastTag;
+
     private Lexer lexer;
 
     public void throwCompilerException(String message) throws Exception {
@@ -45,8 +47,10 @@ public class Parser {
 
     // program’ ::= program $
     public void programLine() throws Exception {
+        System.out.println("------------------------------ INICIO ------------------------------");
         program();
         eat(Tag.END_OF_FILE);
+        System.out.println("------------------------------ FIM ------------------------------");
     }
 
     // program ::= program identifier begin [decl-list] stmt-list end "."
@@ -57,6 +61,7 @@ public class Parser {
         declList();
         stmtList();
         eat(Tag.END);
+        this.lastTag = Tag.END;
         eat(Tag.DOT);
     }
 
@@ -119,12 +124,30 @@ public class Parser {
     public void stmtList() throws Exception {
         try {
             stmt();
-            if (this.currentToken.getTag() == Tag.SEMI_COLON) {
+            if (this.lastTag != Tag.END) {
                 eat(Tag.SEMI_COLON);
+            } else {
+                this.lastTag = null;
             }
-            stmtList();
+
+            switch (this.currentToken.getTag()) {
+                case ID:
+                case IF:
+                case WHILE:
+                case REPEAT:
+                case READ:
+                case WRITE:
+                    stmtList();
+                    break;
+                default:
+                    break;
+            }
+
         } catch (CompilerException e) {
-            return;
+            // return;
+            System.out.println("aaa = " + this.currentToken.toString());
+            throw new CompilerException("(STMT LIST) Token não esperado: " + this.currentToken.toString(),
+                    this.lexer.getLine());
         }
     }
 
@@ -186,11 +209,13 @@ public class Parser {
         switch (this.currentToken.getTag()) {
             case END:
                 eat(Tag.END);
+                this.lastTag = Tag.END;
                 break;
             case ELSE:
                 eat(Tag.ELSE);
                 stmtList();
                 eat(Tag.END);
+                this.lastTag = Tag.END;
                 break;
             default:
                 throw new CompilerException("(IF_STMT_LINE) Token não esperado: " + this.currentToken.toString(),
@@ -221,6 +246,7 @@ public class Parser {
         stmtPrefix();
         stmtList();
         eat(Tag.END);
+        this.lastTag = Tag.END;
     }
 
     // stmt-prefix ::= while condition do
@@ -307,10 +333,15 @@ public class Parser {
             case SINGLE_QUOTE:
             case OPEN_PAR:
             case NOT:
-            case SUB:
                 simpleExpr();
                 addop();
                 simpleExprLine();
+                break;
+            case OR:
+            case ADD:
+            case SUB:
+                addop();
+                expression();
                 break;
             default:
                 break;
