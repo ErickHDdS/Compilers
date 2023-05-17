@@ -124,7 +124,7 @@ public class Parser {
     public void stmtList() throws Exception {
         try {
             stmt();
-            if (this.lastTag != Tag.END) {
+            if (this.lastTag != Tag.END && this.lastTag != Tag.UNTIL) {
                 eat(Tag.SEMI_COLON);
             } else {
                 this.lastTag = null;
@@ -238,6 +238,7 @@ public class Parser {
     // stmt-suffix ::= until condition
     public void stmtSuffix() throws Exception {
         eat(Tag.UNTIL);
+        this.lastTag = Tag.UNTIL;
         condition();
     }
 
