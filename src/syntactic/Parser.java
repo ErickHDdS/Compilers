@@ -9,7 +9,7 @@ public class Parser {
     private Token currentToken;
     private Token lastToken;
 
-    private Tag lastTag;
+    private Tag reservedWordDoesntHaveSemicolon;
 
     private Lexer lexer;
 
@@ -61,11 +61,11 @@ public class Parser {
         declList();
         stmtList();
         eat(Tag.END);
-        this.lastTag = Tag.END;
+        this.reservedWordDoesntHaveSemicolon = Tag.END;
         eat(Tag.DOT);
     }
 
-    // decl-list ::= decl ";" { decl ";"} // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    // decl-list ::= decl ";" { decl ";"}
     public void declList() throws Exception {
         lastToken = this.currentToken;
         try {
@@ -89,8 +89,7 @@ public class Parser {
         }
     }
 
-    // ident-list ::= identifier {"," identifier} // TO DO: VALIDAR REGRA DE
-    // REPETIÇÃO
+    // ident-list ::= identifier {"," identifier}
     public void identList() throws Exception {
         this.lastToken = this.currentToken;
         try {
@@ -120,14 +119,15 @@ public class Parser {
         }
     }
 
-    // stmt-list ::= stmt {";" stmt} // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    // stmt-list ::= stmt {";" stmt}
     public void stmtList() throws Exception {
         try {
             stmt();
-            if (this.lastTag != Tag.END && this.lastTag != Tag.UNTIL) {
+            if (this.reservedWordDoesntHaveSemicolon != Tag.END
+                    && this.reservedWordDoesntHaveSemicolon != Tag.UNTIL) {
                 eat(Tag.SEMI_COLON);
             } else {
-                this.lastTag = null;
+                this.reservedWordDoesntHaveSemicolon = null;
             }
 
             switch (this.currentToken.getTag()) {
@@ -144,8 +144,6 @@ public class Parser {
             }
 
         } catch (CompilerException e) {
-            // return;
-            System.out.println("aaa = " + this.currentToken.toString());
             throw new CompilerException("(STMT LIST) Token não esperado: " + this.currentToken.toString(),
                     this.lexer.getLine());
         }
@@ -209,13 +207,13 @@ public class Parser {
         switch (this.currentToken.getTag()) {
             case END:
                 eat(Tag.END);
-                this.lastTag = Tag.END;
+                this.reservedWordDoesntHaveSemicolon = Tag.END;
                 break;
             case ELSE:
                 eat(Tag.ELSE);
                 stmtList();
                 eat(Tag.END);
-                this.lastTag = Tag.END;
+                this.reservedWordDoesntHaveSemicolon = Tag.END;
                 break;
             default:
                 throw new CompilerException("(IF_STMT_LINE) Token não esperado: " + this.currentToken.toString(),
@@ -238,7 +236,7 @@ public class Parser {
     // stmt-suffix ::= until condition
     public void stmtSuffix() throws Exception {
         eat(Tag.UNTIL);
-        this.lastTag = Tag.UNTIL;
+        this.reservedWordDoesntHaveSemicolon = Tag.UNTIL;
         condition();
     }
 
@@ -247,7 +245,7 @@ public class Parser {
         stmtPrefix();
         stmtList();
         eat(Tag.END);
-        this.lastTag = Tag.END;
+        this.reservedWordDoesntHaveSemicolon = Tag.END;
     }
 
     // stmt-prefix ::= while condition do
@@ -367,6 +365,8 @@ public class Parser {
             case NOT:
             case SUB:
             case AND:
+            case MUL:
+            case DIV:
                 mulop();
                 factorA();
                 termLine();
@@ -535,7 +535,7 @@ public class Parser {
         digit();
     }
 
-    // integer_const ::= digit+ // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    // integer_const ::= digit+
     public void integerConst() throws Exception {
 
         boolean condition = isIntegerConst();
@@ -585,19 +585,13 @@ public class Parser {
         eat(Tag.SINGLE_QUOTE);
     }
 
-    // literal ::= "{" caractere* "}" // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    // literal ::= "{" caractere* "}"
     public void literal() throws Exception {
         eat(Tag.LITERAL);
     }
 
-    // identifier ::= letter (letter | digit | "_")* // TO DO: VALIDAR REGRA DE
-    // REPETIÇÃO
+    // identifier ::= letter (letter | digit | "_")*
     public void identifier() throws Exception {
-        eat(Tag.ID);
-    }
-
-    // letter ::= [A-Za-z] // TO DO
-    public void letter() throws Exception {
         eat(Tag.ID);
     }
 }
