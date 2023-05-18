@@ -24,7 +24,9 @@ public class Compiler {
                 // System.out.println(token.toString() + " ");
                 parser.programLine();
 
-            } while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
+            }
+            // while (token.getTag() != Tag.END_OF_FILE);
+            while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
 
         } catch (FileNotFoundException e) {
             System.out.println("Insira o nome de um arquivo válido.");
