@@ -2,30 +2,29 @@ import java.io.FileNotFoundException;
 
 import lexical.Lexer;
 import lexical.Tag;
-import lexical.Token;
 import syntactic.Parser;
 import utils.CompilerException;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        // Scanner input = new Scanner(System.in);
-
         String fileName = args[0];
+        String debugParam = args.length > 1 ? args[1] : "";
+
+        boolean debug = false;
+        if (debugParam.equals("-d")) {
+            System.out.println("Debug mode on.");
+            debug = true;
+        }
 
         Lexer lexer;
-        Token token;
         Parser parser;
 
         try {
             lexer = new Lexer(fileName);
-            parser = new Parser(lexer);
+            parser = new Parser(lexer, debug);
             do {
-                // token = lexer.scan();
-                // System.out.println(token.toString() + " ");
                 parser.programLine();
-
             }
-            // while (token.getTag() != Tag.END_OF_FILE);
             while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
 
         } catch (FileNotFoundException e) {

@@ -97,6 +97,8 @@ Para utilizar o compilador, siga os passos abaixo:
 4. Compile o código-fonte utilizando o comando `javac Compiler.java `
 5. Execute o compilador utilizando o comando `java Compiler <file-path>`
 
+> **Observação:** O compilador espera receber como parâmetro o caminho para um arquivo de código-fonte. Também é possível passar o parâmetro `-d` que ira ativar o modo de debug, que exibe informações sobre o processo de compilação. Exemplo: `java Compiler <file-path> -d`
+
 ## Realizado por:
 
 [**Erick H. D. de Souza**](https://github.com/ErickHDdS) <br>

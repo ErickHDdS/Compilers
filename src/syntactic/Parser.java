@@ -9,24 +9,22 @@ public class Parser {
     private Token currentToken;
     private Token lastToken;
 
-    private Tag reservedWordDoesntHaveSemicolon;
-
-    private Lexer lexer;
-
-    public void throwCompilerException(String message) throws Exception {
-        throw new CompilerException(message, this.lexer.getLine());
-    }
-
     public Token getCurrentToken() {
         return currentToken;
     }
 
-    public Token getLastToken() {
-        return lastToken;
+    private Tag reservedWordDoesNotHaveSemicolon;
+
+    private Lexer lexer;
+    public void throwCompilerException(String message) throws Exception {
+        throw new CompilerException(message, Lexer.getLine());
     }
 
-    public Parser(Lexer lexer) throws Exception {
+    private boolean debug;
+
+    public Parser(Lexer lexer, boolean debug) throws Exception {
         this.lexer = lexer;
+        this.debug = debug;
         advance();
     }
 
@@ -35,39 +33,52 @@ public class Parser {
     }
 
     private void eat(Tag tag) throws Exception {
-        if (this.currentToken.getTag().toString().equals(tag.toString())) {
+        boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
+        if (isCurrentTokenEqualTag) {
             System.out.println(this.currentToken.toString());
             advance();
         } else {
-            throw new CompilerException("(EAT) Erro na leitura do token: " +
-                    this.currentToken.toString() + "\n Token esperado: " + tag.toString(),
-                    this.lexer.getLine());
+            String message = "(EAT) Erro na leitura do token: " + this.currentToken.toString() + "\n Token esperado: "
+                    + tag.toString();
+            this.throwCompilerException(message);
         }
     }
 
     // program’ ::= program $
     public void programLine() throws Exception {
-        System.out.println("------------------------------ INICIO ------------------------------");
+        if (debug) {
+            System.out.println("------------------------------ INICIO ------------------------------");
+        }
         program();
         eat(Tag.END_OF_FILE);
-        System.out.println("------------------------------ FIM ------------------------------");
+        if (debug) {
+            System.out.println("------------------------------ FIM ------------------------------");
+        }
     }
 
     // program ::= program identifier begin [decl-list] stmt-list end "."
     public void program() throws Exception {
+        if (debug) {
+            System.out.println("program ::= program identifier begin [decl-list] stmt-list end \".\"");
+        }
         eat(Tag.PROGRAM);
         identifier();
         eat(Tag.BEGIN);
         declList();
         stmtList();
         eat(Tag.END);
-        this.reservedWordDoesntHaveSemicolon = Tag.END;
+        this.reservedWordDoesNotHaveSemicolon = Tag.END;
         eat(Tag.DOT);
     }
 
     // decl-list ::= decl ";" { decl ";"}
     public void declList() throws Exception {
+        if (debug) {
+            System.out.println("decl-list ::= decl \";\" { decl \";\"}");
+        }
+
         lastToken = this.currentToken;
+        
         try {
             decl();
             eat(Tag.SEMI_COLON);
@@ -79,19 +90,27 @@ public class Parser {
 
     // decl ::= ident-list is type
     public void decl() throws Exception {
+        if (debug) {
+            System.out.println("decl ::= ident-list is type");
+        }
         try {
             identList();
             eat(Tag.IS);
             type();
         } catch (CompilerException e) {
-            throw new CompilerException("(DECL) Token não esperado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+            String message = "(DECL) Erro na declaração de variável: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         }
     }
 
     // ident-list ::= identifier {"," identifier}
     public void identList() throws Exception {
+        if (debug) {
+            System.out.println("ident-list ::= identifier {\",\" identifier}");
+        }
+
         this.lastToken = this.currentToken;
+
         try {
             identifier();
             eat(Tag.COMMA);
@@ -103,6 +122,10 @@ public class Parser {
 
     // type ::= int | float | char
     public void type() throws Exception {
+        if (debug) {
+            System.out.println("type ::= int | float | char");
+        }
+
         switch (this.currentToken.getTag()) {
             case INT:
                 eat(Tag.INT);
@@ -114,20 +137,24 @@ public class Parser {
                 eat(Tag.CHAR);
                 break;
             default:
-                throw new CompilerException("(TYPE) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(TYPE) Erro na declaração de tipo: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // stmt-list ::= stmt {";" stmt}
     public void stmtList() throws Exception {
+        if (debug) {
+            System.out.println("stmt-list ::= stmt {\";\" stmt}");
+        }
+
         try {
             stmt();
-            if (this.reservedWordDoesntHaveSemicolon != Tag.END
-                    && this.reservedWordDoesntHaveSemicolon != Tag.UNTIL) {
+            if (this.reservedWordDoesNotHaveSemicolon != Tag.END
+                    && this.reservedWordDoesNotHaveSemicolon != Tag.UNTIL) {
                 eat(Tag.SEMI_COLON);
             } else {
-                this.reservedWordDoesntHaveSemicolon = null;
+                this.reservedWordDoesNotHaveSemicolon = null;
             }
 
             switch (this.currentToken.getTag()) {
@@ -144,14 +171,18 @@ public class Parser {
             }
 
         } catch (CompilerException e) {
-            throw new CompilerException("(STMT LIST) Token não esperado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+            String message = "(STMT LIST) Erro na leitura do token: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         }
     }
 
     // stmt ::= assign-stmt | if-stmt | while-stmt | repeat-stmt | read-stmt |
     // write-stmt
     public void stmt() throws Exception {
+        if (debug) {
+            System.out.println("stmt ::= assign-stmt | if-stmt | while-stmt | repeat-stmt | read-stmt | write-stmt");
+        }
+
         // Tratamento para a saída de decl-list para stmt-list
         if (this.lastToken != null && this.lastToken.getTag().toString().equals(Tag.ID.toString())) {
             // assign-stmt ::= identifier(eat) "=" simple_expr
@@ -181,13 +212,17 @@ public class Parser {
                 writeStmt();
                 break;
             default:
-                throw new CompilerException("(STMT) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(STMT) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // assign-stmt ::= identifier "=" simple_expr
     public void assignStmt() throws Exception {
+        if (debug) {
+            System.out.println("assign-stmt ::= identifier(eat) \"=\" simple_expr");
+        }
+
         identifier();
         eat(Tag.ASSIGN);
         simpleExpr();
@@ -195,6 +230,10 @@ public class Parser {
 
     // if-stmt ::= if condition then stmt-list if-stmt’
     public void ifStmt() throws Exception {
+        if (debug) {
+            System.out.println("if-stmt ::= if condition then stmt-list if-stmt’");
+        }
+
         eat(Tag.IF);
         condition();
         eat(Tag.THEN);
@@ -204,30 +243,42 @@ public class Parser {
 
     // if-stmt’ ::= end | else stmt-list end
     public void ifStmtLine() throws Exception {
+        if (debug) {
+            System.out.println("if-stmt' ::= end | else stmt-list end");
+        }
+
         switch (this.currentToken.getTag()) {
             case END:
                 eat(Tag.END);
-                this.reservedWordDoesntHaveSemicolon = Tag.END;
+                this.reservedWordDoesNotHaveSemicolon = Tag.END;
                 break;
             case ELSE:
                 eat(Tag.ELSE);
                 stmtList();
                 eat(Tag.END);
-                this.reservedWordDoesntHaveSemicolon = Tag.END;
+                this.reservedWordDoesNotHaveSemicolon = Tag.END;
                 break;
             default:
-                throw new CompilerException("(IF_STMT_LINE) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(IF_STMT_LINE) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // condition ::= expression
     public void condition() throws Exception {
+        if (debug) {
+            System.out.println("condition ::= expression");
+        }
+
         expression();
     }
 
     // repeat-stmt ::= repeat stmt-list stmt-suffix
     public void repeatStmt() throws Exception {
+        if (debug) {
+            System.out.println("repeat-stmt ::= repeat stmt-list stmt-suffix");
+        }
+
         eat(Tag.REPEAT);
         stmtList();
         stmtSuffix();
@@ -235,21 +286,33 @@ public class Parser {
 
     // stmt-suffix ::= until condition
     public void stmtSuffix() throws Exception {
+        if (debug) {
+            System.out.println("stmt-suffix ::= until condition");
+        }
+
         eat(Tag.UNTIL);
-        this.reservedWordDoesntHaveSemicolon = Tag.UNTIL;
+        this.reservedWordDoesNotHaveSemicolon = Tag.UNTIL;
         condition();
     }
 
     // while-stmt ::= stmt-prefix stmt-list end
     public void whileStmt() throws Exception {
+        if (debug) {
+            System.out.println("while-stmt ::= stmt-prefix stmt-list end");
+        }
+
         stmtPrefix();
         stmtList();
         eat(Tag.END);
-        this.reservedWordDoesntHaveSemicolon = Tag.END;
+        this.reservedWordDoesNotHaveSemicolon = Tag.END;
     }
 
     // stmt-prefix ::= while condition do
     public void stmtPrefix() throws Exception {
+        if (debug) {
+            System.out.println("stmt-prefix ::= while condition do");
+        }
+
         eat(Tag.WHILE);
         condition();
         eat(Tag.DO);
@@ -257,6 +320,10 @@ public class Parser {
 
     // read-stmt ::= read "(" identifier ")"
     public void readStmt() throws Exception {
+        if (debug) {
+            System.out.println("read-stmt ::= read \"(\" identifier \")\"");
+        }
+
         eat(Tag.READ);
         eat(Tag.OPEN_PAR);
         identifier();
@@ -265,6 +332,10 @@ public class Parser {
 
     // write-stmt ::= write "(" writable ")"
     public void writeStmt() throws Exception {
+        if (debug) {
+            System.out.println("write-stmt ::= write \"(\" writable \")\"");
+        }
+
         eat(Tag.WRITE);
         eat(Tag.OPEN_PAR);
         writable();
@@ -273,6 +344,10 @@ public class Parser {
 
     // writable ::= simple-expr | literal
     public void writable() throws Exception {
+        if (debug) {
+            System.out.println("writable ::= simple-expr | literal");
+        }
+
         switch (this.currentToken.getTag()) {
             case ID:
             case CONST_INT:
@@ -288,19 +363,27 @@ public class Parser {
                 literal();
                 break;
             default:
-                throw new CompilerException("(WRITABLE) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(WRITABLE) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // expression ::= simple-expr expression’
     public void expression() throws Exception {
+        if (debug) {
+            System.out.println("expression ::= simple-expr expression’");
+        }
+
         simpleExpr();
         expressionLine();
     }
 
     // expression’ ::= relop simple-expr
     public void expressionLine() throws Exception {
+        if (debug) {
+            System.out.println("expression' ::= relop simple-expr");
+        }
+
         switch (this.currentToken.getTag()) {
             case EQUALS:
             case GREATER:
@@ -318,12 +401,20 @@ public class Parser {
 
     // simple-expr ::= term simple-expr’
     public void simpleExpr() throws Exception {
+        if (debug) {
+            System.out.println("simple-expr ::= term simple-expr'");
+        }
+
         term();
         simpleExprLine();
     }
 
     // simple-expr’ ::= simple-expr addop simple-expr’ | λ
     public void simpleExprLine() throws Exception {
+        if (debug) {
+            System.out.println("simple-expr' ::= simple-expr addop simple-expr' | λ");
+        }
+
         switch (this.currentToken.getTag()) {
             case ID:
             case CONST_INT:
@@ -349,12 +440,20 @@ public class Parser {
 
     // term ::= factor-a term’
     public void term() throws Exception {
+        if (debug) {
+            System.out.println("term ::= factor-a term'");
+        }
+
         factorA();
         termLine();
     }
 
     // term’ ::= mulop factor-a term’ | λ
     public void termLine() throws Exception {
+        if (debug) {
+            System.out.println("term' ::= mulop factor-a term' | λ");
+        }
+
         switch (this.currentToken.getTag()) {
             case ID:
             case CONST_INT:
@@ -378,6 +477,10 @@ public class Parser {
 
     // factor-a ::= factor |"!" factor | "-" factor
     public void factorA() throws Exception {
+        if (debug) {
+            System.out.println("factor-a ::= factor |\"!\" factor | \"-\" factor");
+        }
+
         switch (this.currentToken.getTag()) {
             case ID:
             case CONST_INT:
@@ -396,13 +499,17 @@ public class Parser {
                 factor();
                 break;
             default:
-                throw new CompilerException("(FACTOR-A) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(FACTOR-A) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // factor ::= identifier | constant | "(" expression ")"
     public void factor() throws Exception {
+        if (debug) {
+            System.out.println("factor ::= identifier | constant | \"(\" expression \")\"");
+        }
+
         switch (this.currentToken.getTag()) {
             case ID:
                 identifier();
@@ -419,13 +526,17 @@ public class Parser {
                 break;
 
             default:
-                throw new CompilerException("(FACTOR) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(FACTOR) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // relop ::= "==" | ">" | ">=" | "<" | "<=" | "!="
     public void relop() throws Exception {
+        if (debug) {
+            System.out.println("relop ::= \"==\" | \">\" | \">=\" | \"<\" | \"<=\" | \"!=\"");
+        }
+
         switch (this.currentToken.getTag()) {
             case EQUALS:
                 eat(Tag.EQUALS);
@@ -446,13 +557,17 @@ public class Parser {
                 eat(Tag.NOT_EQUALS);
                 break;
             default:
-                throw new CompilerException("(RELOP) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(RELOP) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // addop ::= "+" | "-" | "||"
     public void addop() throws Exception {
+        if (debug) {
+            System.out.println("addop ::= \"+\" | \"-\" | \"||\"");
+        }
+
         switch (this.currentToken.getTag()) {
             case ADD:
                 eat(Tag.ADD);
@@ -464,13 +579,16 @@ public class Parser {
                 eat(Tag.OR);
                 break;
             default:
-                throw new CompilerException("(ADDOP) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(ADDOP) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // mulop ::= "*" | "/" | "&&"
     public void mulop() throws Exception {
+        if (debug) {
+            System.out.println("mulop ::= \"*\" | \"/\" | \"&&\"");
+        }
 
         switch (this.currentToken.getTag()) {
             case MUL:
@@ -483,13 +601,17 @@ public class Parser {
                 eat(Tag.AND);
                 break;
             default:
-                throw new CompilerException("(MULOP) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(MULOP) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // constant ::= integer_const | float_const | char_const
     public void constant() throws Exception {
+        if (debug) {
+            System.out.println("constant ::= integer_const | float_const | char_const");
+        }
+
         switch (this.currentToken.getTag()) {
             case CONST_INT:
                 eat(Tag.CONST_INT);
@@ -501,26 +623,38 @@ public class Parser {
                 eat(Tag.CONST_CHAR);
                 break;
             default:
-                throw new CompilerException("(CONSTANT) Token não esperado: " + this.currentToken.toString(),
-                        this.lexer.getLine());
+                String message = "(CONSTANT) Token não esperado: " + this.currentToken.toString();
+                this.throwCompilerException(message);
         }
     }
 
     // digit ::= [0-9]
     public void digit() throws Exception {
+        if (debug) {
+            System.out.println("digit ::= [0-9]");
+        }
+
         eat(Tag.INT);
     }
 
     // carac ::= um dos caracteres ASCII
     public void carac() throws Exception {
+        if (debug) {
+            System.out.println("carac ::= um dos caracteres ASCII");
+        }
+
         eat(Tag.ID);
     }
 
     // caractere ::= um dos caracteres ASCII, exceto quebra de linha
     public void caractere() throws Exception {
+        if (debug) {
+            System.out.println("caractere ::= um dos caracteres ASCII, exceto quebra de linha");
+        }
+
         if (this.currentToken.toString() == "\n") {
-            throw new CompilerException("(CARACTERE) Token não esperado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+            String message = "(CARACTERE) Token não esperado: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         } else {
             eat(Tag.ID);
         }
@@ -540,8 +674,8 @@ public class Parser {
 
         boolean condition = isIntegerConst();
         if (!condition) {
-            throw new CompilerException("(INTEGER_CONST) Inteiro mal formatado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+            String message = "(INTEGER_CONST) Inteiro mal formatado: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         }
 
         while (isIntegerConst()) {
@@ -551,13 +685,9 @@ public class Parser {
 
     // float_const ::= digit+ "." digit+ // TO DO: VALIDAR REGRA DE REPETIÇÃO
     public void floatConst() throws Exception {
-        boolean condition;
-
-        condition = isIntegerConst();
-        if (!condition) {
-            throw new CompilerException(
-                    "(FLOAT_CONST) Decimal (parte inteira) mal formatado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+        if (!isIntegerConst()) {
+            String message = "(FLOAT_CONST) Decimal (parte inteira) mal formatado: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         }
 
         while (isIntegerConst()) {
@@ -566,11 +696,9 @@ public class Parser {
 
         eat(Tag.DOT);
 
-        condition = isIntegerConst();
-        if (!condition) {
-            throw new CompilerException(
-                    "(FLOAT_CONST) Decimal (parte fracionada) mal formatado: " + this.currentToken.toString(),
-                    this.lexer.getLine());
+        if (!isIntegerConst()) {
+            String message = "(FLOAT_CONST) Decimal (parte fracionada) mal formatado: " + this.currentToken.toString();
+            this.throwCompilerException(message);
         }
 
         while (isIntegerConst()) {
@@ -580,6 +708,10 @@ public class Parser {
 
     // char_const ::= "'" carac "'"
     public void charConst() throws Exception {
+        if (debug) {
+            System.out.println("char_const ::= \"'\" carac \"'\"");
+        }
+
         eat(Tag.SINGLE_QUOTE);
         carac();
         eat(Tag.SINGLE_QUOTE);
@@ -587,11 +719,19 @@ public class Parser {
 
     // literal ::= "{" caractere* "}"
     public void literal() throws Exception {
+        if (debug) {
+            System.out.println("literal ::= \"{\" caractere* \"}\"");
+        }
+
         eat(Tag.LITERAL);
     }
 
     // identifier ::= letter (letter | digit | "_")*
     public void identifier() throws Exception {
+        if (debug) {
+            System.out.println("identifier ::= letter (letter | digit | \"_\")*");
+        }
+
         eat(Tag.ID);
     }
 }
