@@ -83,7 +83,7 @@ letter ::= [A-Za-z]
 O compilador implementado neste repositório é capaz de realizar as seguintes funcionalidades:
 
 - [x] Análise léxica
-- [ ] Análise sintática
+- [x] Análise sintática
 - [ ] Análise semântica
 - [ ] Geração de código
 
