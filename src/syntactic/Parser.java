@@ -16,6 +16,7 @@ public class Parser {
     private Tag reservedWordDoesNotHaveSemicolon;
 
     private Lexer lexer;
+
     public void throwCompilerException(String message) throws Exception {
         throw new CompilerException(message, Lexer.getLine());
     }
@@ -78,7 +79,7 @@ public class Parser {
         }
 
         lastToken = this.currentToken;
-        
+
         try {
             decl();
             eat(Tag.SEMI_COLON);
@@ -683,7 +684,7 @@ public class Parser {
         }
     }
 
-    // float_const ::= digit+ "." digit+ // TO DO: VALIDAR REGRA DE REPETIÇÃO
+    // float_const ::= digit+ "." digit+
     public void floatConst() throws Exception {
         if (!isIntegerConst()) {
             String message = "(FLOAT_CONST) Decimal (parte inteira) mal formatado: " + this.currentToken.toString();
