@@ -35,7 +35,7 @@ public class Parser {
     private void eat(Tag tag) throws Exception {
         boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
         if (isCurrentTokenEqualTag) {
-            System.out.println(this.currentToken.toString());
+            // System.out.println(this.currentToken.toString());
             advance();
         } else {
             String message = "(EAT) Erro na leitura do token: " + this.currentToken.toString() + "\n Token esperado: "
