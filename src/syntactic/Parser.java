@@ -8,25 +8,26 @@ import utils.CompilerException;
 public class Parser {
     private Token currentToken;
     private Token lastToken;
+    private Tag reservedWordDoesNotHaveSemicolon;
+    private Table symbolTable;
+    private Lexer lexer;
+    private boolean debug;
+    private Semantic semantic;
+
+    public Parser(Lexer lexer, Table symbolTable, boolean debug) throws Exception {
+        this.symbolTable = symbolTable;
+        this.lexer = lexer;
+        this.debug = debug;
+        this.semantic = new Semantic(symbolTable);
+        advance();
+    }
 
     public Token getCurrentToken() {
         return currentToken;
     }
 
-    private Tag reservedWordDoesNotHaveSemicolon;
-
-    private Lexer lexer;
-
     public void throwCompilerException(String message) throws Exception {
         throw new CompilerException(message, Lexer.getLine());
-    }
-
-    private boolean debug;
-
-    public Parser(Lexer lexer, boolean debug) throws Exception {
-        this.lexer = lexer;
-        this.debug = debug;
-        advance();
     }
 
     private void advance() throws Exception {
@@ -67,6 +68,7 @@ public class Parser {
         }
         eat(Tag.PROGRAM);
         identifier();
+        // semantic.addIdentifier(this.lastToken);
         eat(Tag.BEGIN);
         declList();
         stmtList();

@@ -9,9 +9,9 @@ import utils.CompilerException;
 
 public class Lexer {
     private static final int EOF = 65535;
-
+    
     public static int line = 1; // contador de linhas
-
+    
     private char currentChar = ' '; // caractere lido do arquivo
     private FileReader file; // arquivo fonte
 
