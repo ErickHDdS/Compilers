@@ -34,6 +34,9 @@ public class Parser {
     }
 
     private void eat(Tag tag) throws Exception {
+        if (tag == Tag.ID)
+            System.out.println(this.currentToken);
+
         boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
         if (isCurrentTokenEqualTag) {
             // System.out.println(this.currentToken.toString());
@@ -94,10 +97,16 @@ public class Parser {
         if (debug) {
             System.out.println("decl ::= ident-list is type");
         }
+
+        // Token
         try {
+            // Token identifiers =
             identList();
             eat(Tag.IS);
+            // Tag type =
             type();
+
+            // identifier.setTypeOfTag(type);
         } catch (CompilerException e) {
             String message = "(DECL) Erro na declaração de variável: " + this.currentToken.toString();
             this.throwCompilerException(message);
@@ -732,7 +741,7 @@ public class Parser {
         if (debug) {
             System.out.println("identifier ::= letter (letter | digit | \"_\")*");
         }
-
+        // String identifer =
         eat(Tag.ID);
     }
 }

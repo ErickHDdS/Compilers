@@ -24,8 +24,9 @@ public class Compiler {
             parser = new Parser(lexer, debug);
             do {
                 parser.programLine();
-            }
-            while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
+            } while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
+
+            lexer.symbolTableInfos.printTable();
 
         } catch (FileNotFoundException e) {
             System.out.println("Insira o nome de um arquivo válido.");

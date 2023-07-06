@@ -15,7 +15,7 @@ public class Lexer {
     private char currentChar = ' '; // caractere lido do arquivo
     private FileReader file; // arquivo fonte
 
-    public Table symbolTable = new Table();
+    public Table symbolTableInfos = new Table();
 
     public Lexer(String file) throws FileNotFoundException {
         try {
@@ -97,13 +97,13 @@ public class Lexer {
             } while (Character.isLetterOrDigit(this.currentChar) || this.currentChar == '_');
 
             String s = str.toString();
-            Tag t = symbolTable.findTag(s);
+            Token t = symbolTableInfos.findToken(s);
 
-            if (t != Tag.ID)
-                return new Word(s, t); // palavra já existe na HashTable
+            if (t.getTag() != Tag.ID)
+                return new Word(s, t.getTag()); // palavra já existe na HashTable
             else {
                 Word w = new Word(s, Tag.ID);
-                symbolTable.put(s, w.getTag());
+                symbolTableInfos.put(s, w.getTag());
                 return w;
             }
         }
