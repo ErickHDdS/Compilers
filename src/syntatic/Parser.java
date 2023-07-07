@@ -1,25 +1,59 @@
-package syntactic;
+package syntatic;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import lexical.Lexer;
 import lexical.Tag;
 import lexical.Token;
+import lexical.Types;
+import lexical.Word;
 import utils.CompilerException;
+import semantic.Semantic;
+import symbolTable.Table;
 
 public class Parser {
-    private Token currentToken;
-    private Token lastToken;
+    private Word currentToken;
+    private Word lastToken;
     private Tag reservedWordDoesNotHaveSemicolon;
-    private Table symbolTable;
+
+    public Table getSymbolTable() {
+        return lexer.symbolTableInfos;
+    }
+
     private Lexer lexer;
     private boolean debug;
     private Semantic semantic;
 
-    public Parser(Lexer lexer, Table symbolTable, boolean debug) throws Exception {
-        this.symbolTable = symbolTable;
+    private Map<String, Word> wordsInDeclaration = new HashMap<String, Word>();
+
+    public Parser(Lexer lexer, boolean debug) throws Exception {
         this.lexer = lexer;
         this.debug = debug;
-        this.semantic = new Semantic(symbolTable);
+        this.semantic = new Semantic(lexer.symbolTableInfos);
         advance();
+    }
+
+    // TO DO: APAGAR ESTA FUNCAO
+    public void printTableWordsInDeclaration() {
+        for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
+            String key = entry.getKey();
+            Word w = entry.getValue();
+            System.out.println("{" + key + "}" + " --> " + w.getLexeme() + "|" + w.getTag() + "|" + w.getTypeOfTag());
+        }
+    }
+
+    public void addTypeWordsInDeclarationInTable(Types type) {
+        for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
+            Word w = entry.getValue();
+
+            // System.out.println("WORD: " + w.getLexeme() + " | " + "TIPO: " +
+            // type.toString());
+            lexer.symbolTableInfos.setSetTypeOfTag(w, type);
+
+            this.wordsInDeclaration = new HashMap<String, Word>();
+
+        }
     }
 
     public Token getCurrentToken() {
@@ -35,12 +69,9 @@ public class Parser {
     }
 
     private void eat(Tag tag) throws Exception {
-        if (tag == Tag.ID)
-            System.out.println(this.currentToken);
 
         boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
         if (isCurrentTokenEqualTag) {
-            // System.out.println(this.currentToken.toString());
             advance();
         } else {
             String message = "(EAT) Erro na leitura do token: " + this.currentToken.toString() + "\n Token esperado: "
@@ -67,8 +98,15 @@ public class Parser {
             System.out.println("program ::= program identifier begin [decl-list] stmt-list end \".\"");
         }
         eat(Tag.PROGRAM);
+
+        boolean isInvalid = this.semantic.containsString(this.currentToken.getLexeme());
+        if (isInvalid) {
+            String message = "(PROGRAM) Erro variável já declarada: " +
+                    this.currentToken.getLexeme();
+            this.throwCompilerException(message);
+        }
         identifier();
-        // semantic.addIdentifier(this.lastToken);
+
         eat(Tag.BEGIN);
         declList();
         stmtList();
@@ -99,14 +137,13 @@ public class Parser {
         if (debug) {
             System.out.println("decl ::= ident-list is type");
         }
-
-        // Token
         try {
-            // Token identifiers =
             identList();
+            // printTableWordsInDeclaration();
             eat(Tag.IS);
-            // Tag type =
-            type();
+            Types type = type();
+
+            addTypeWordsInDeclarationInTable(type);
 
             // identifier.setTypeOfTag(type);
         } catch (CompilerException e) {
@@ -124,6 +161,15 @@ public class Parser {
         this.lastToken = this.currentToken;
 
         try {
+            // this.lexer.getSymbolTableInfos().printTable();
+            // boolean isInvalid =
+            // this.semantic.containsString(this.currentToken.getLexeme());
+            // if (isInvalid) {
+            // String message = "(PROGRAM) Erro variável já declarada: " +
+            // this.currentToken.getLexeme();
+            // this.throwCompilerException(message);
+            // }
+            wordsInDeclaration.put(this.currentToken.getLexeme(), this.currentToken);
             identifier();
             eat(Tag.COMMA);
             identList();
@@ -133,25 +179,26 @@ public class Parser {
     }
 
     // type ::= int | float | char
-    public void type() throws Exception {
+    public Types type() throws Exception {
         if (debug) {
             System.out.println("type ::= int | float | char");
         }
-
         switch (this.currentToken.getTag()) {
             case INT:
                 eat(Tag.INT);
-                break;
+                return Types.INTEGER;
+
             case FLOAT:
                 eat(Tag.FLOAT);
-                break;
+                return Types.FLOAT;
             case CHAR:
                 eat(Tag.CHAR);
-                break;
+                return Types.CHAR;
             default:
                 String message = "(TYPE) Erro na declaração de tipo: " + this.currentToken.toString();
                 this.throwCompilerException(message);
         }
+        return null;
     }
 
     // stmt-list ::= stmt {";" stmt}
@@ -235,6 +282,13 @@ public class Parser {
             System.out.println("assign-stmt ::= identifier(eat) \"=\" simple_expr");
         }
 
+        // boolean isInvalid =
+        // this.semantic.containsString(this.currentToken.getLexeme());
+        // if (isInvalid) {
+        // String message = "(PROGRAM) Erro variável já declarada: " +
+        // this.currentToken.getLexeme();
+        // this.throwCompilerException(message);
+        // }
         identifier();
         eat(Tag.ASSIGN);
         simpleExpr();
@@ -338,6 +392,13 @@ public class Parser {
 
         eat(Tag.READ);
         eat(Tag.OPEN_PAR);
+        // boolean isInvalid =
+        // this.semantic.containsString(this.currentToken.getLexeme());
+        // if (isInvalid) {
+        // String message = "(PROGRAM) Erro variável já declarada: " +
+        // this.currentToken.getLexeme();
+        // this.throwCompilerException(message);
+        // }
         identifier();
         eat(Tag.CLOSE_PAR);
     }
@@ -524,6 +585,13 @@ public class Parser {
 
         switch (this.currentToken.getTag()) {
             case ID:
+                // boolean isInvalid =
+                // this.semantic.containsString(this.currentToken.getLexeme());
+                // if (isInvalid) {
+                // String message = "(PROGRAM) Erro variável já declarada: " +
+                // this.currentToken.getLexeme();
+                // this.throwCompilerException(message);
+                // }
                 identifier();
                 break;
             case CONST_INT:
@@ -743,7 +811,7 @@ public class Parser {
         if (debug) {
             System.out.println("identifier ::= letter (letter | digit | \"_\")*");
         }
-        // String identifer =
+        lexer.putWordInSymbolTable(this.currentToken);
         eat(Tag.ID);
     }
 }

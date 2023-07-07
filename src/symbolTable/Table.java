@@ -4,77 +4,84 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lexical.Tag;
-import lexical.Token;
+import lexical.Types;
+import lexical.Word;
 
 public class Table {
-    public Map<String, Token> table;
+    public Map<String, Word> table;
 
     public Table() {
-        this.table = new HashMap<String, Token>();
+        this.table = new HashMap<String, Word>();
 
         // SYMBOLS
-        this.table.put(".", new Token(Tag.DOT));
-        this.table.put(";", new Token(Tag.SEMI_COLON));
-        this.table.put(",", new Token(Tag.COMMA));
-        this.table.put("(", new Token(Tag.OPEN_PAR));
-        this.table.put(")", new Token(Tag.CLOSE_PAR));
-        this.table.put("{", new Token(Tag.OPEN_BRACKET));
-        this.table.put("}", new Token(Tag.CLOSE_BRACKET));
+        this.table.put(".", Word.DOT);
+        this.table.put(";", Word.SEMI_COLON);
+        this.table.put(",", Word.COMMA);
+        this.table.put("(", Word.OPEN_PAR);
+        this.table.put(")", Word.CLOSE_PAR);
+        this.table.put("{", Word.OPEN_BRACKET);
+        this.table.put("}", Word.CLOSE_BRACKET);
 
         // OPERATORS
-        this.table.put("=", new Token(Tag.ASSIGN));
-        this.table.put("!", new Token(Tag.NOT));
-        this.table.put("==", new Token(Tag.EQUALS));
-        this.table.put(">", new Token(Tag.GREATER));
-        this.table.put(">=", new Token(Tag.GREATER_EQ));
-        this.table.put("<", new Token(Tag.LOWER));
-        this.table.put("<=", new Token(Tag.LOWER_EQ));
-        this.table.put("!=", new Token(Tag.NOT_EQUALS));
-        this.table.put("+", new Token(Tag.ADD));
-        this.table.put("-", new Token(Tag.SUB));
-        this.table.put("||", new Token(Tag.OR));
-        this.table.put("*", new Token(Tag.MUL));
-        this.table.put("/", new Token(Tag.DIV));
-        this.table.put("&&", new Token(Tag.AND));
-        this.table.put("_", new Token(Tag.UNDERLINE));
+        this.table.put("=", Word.ASSIGN);
+        this.table.put("!", Word.NOT);
+        this.table.put("==", Word.EQUALS);
+        this.table.put(">", Word.GREATER);
+        this.table.put(">=", Word.GREATER_EQ);
+        this.table.put("<", Word.LOWER);
+        this.table.put("<=", Word.LOWER_EQ);
+        this.table.put("!=", Word.NOT_EQUALS);
+        this.table.put("+", Word.ADD);
+        this.table.put("-", Word.SUB);
+        this.table.put("||", Word.OR);
+        this.table.put("*", Word.MUL);
+        this.table.put("/", Word.DIV);
+        this.table.put("&&", Word.AND);
+        this.table.put("_", Word.UNDERLINE);
 
         // KEYWORDS
-        this.table.put("program", new Token(Tag.PROGRAM));
-        this.table.put("begin", new Token(Tag.BEGIN));
-        this.table.put("end", new Token(Tag.END));
-        this.table.put("is", new Token(Tag.IS));
-        this.table.put("int", new Token(Tag.INT));
-        this.table.put("float", new Token(Tag.FLOAT));
-        this.table.put("char", new Token(Tag.CHAR));
-        this.table.put("if", new Token(Tag.IF));
-        this.table.put("else", new Token(Tag.ELSE));
-        this.table.put("then", new Token(Tag.THEN));
-        this.table.put("repeat", new Token(Tag.REPEAT));
-        this.table.put("until", new Token(Tag.UNTIL));
-        this.table.put("while", new Token(Tag.WHILE));
-        this.table.put("do", new Token(Tag.DO));
-        this.table.put("read", new Token(Tag.READ));
-        this.table.put("write", new Token(Tag.WRITE));
+        this.table.put("program", Word.PROGRAM);
+        this.table.put("begin", Word.BEGIN);
+        this.table.put("end", Word.END);
+        this.table.put("is", Word.IS);
+        this.table.put("int", Word.INT);
+        this.table.put("float", Word.FLOAT);
+        this.table.put("char", Word.CHAR);
+        this.table.put("if", Word.IF);
+        this.table.put("else", Word.ELSE);
+        this.table.put("then", Word.THEN);
+        this.table.put("repeat", Word.REPEAT);
+        this.table.put("until", Word.UNTIL);
+        this.table.put("while", Word.WHILE);
+        this.table.put("do", Word.DO);
+        this.table.put("read", Word.READ);
+        this.table.put("write", Word.WRITE);
 
     }
 
-    public Token findToken(String str) {
-        return this.containsString(str) ? this.table.get(str) : new Token(Tag.ID);
+    public Word findToken(String str) {
+        return this.containsString(str) ? this.table.get(str) : new Word(str, Tag.ID);
     }
 
     public boolean containsString(String str) {
         return this.table.containsKey(str);
     }
 
-    public void put(String lexeme, Tag tag) {
-        this.table.put(lexeme, new Token(tag));
+    public void put(String lexeme, Word w) {
+        this.table.put(lexeme, w);
+    }
+
+    public void setSetTypeOfTag(Word word, Types setTypeOfTag) {
+        word.setTypeOfTag(setTypeOfTag);
+        put(word.getLexeme(), word);
     }
 
     public void printTable() {
-        for (Map.Entry<String, Token> entry : this.table.entrySet()) {
+        for (Map.Entry<String, Word> entry : this.table.entrySet()) {
             String key = entry.getKey();
-            Token tg = entry.getValue();
-            System.out.println("{" + key + "}" + " --> " + tg.getTag() + "|" + tg.getTypeOfTag());
+            Word w = entry.getValue();
+            System.out.println("{" + key + "}" + " --> " + w.getLexeme() + "|" + w.getTag() + "|" + w.getTypeOfTag());
         }
     }
+
 }

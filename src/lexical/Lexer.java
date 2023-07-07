@@ -9,9 +9,9 @@ import utils.CompilerException;
 
 public class Lexer {
     private static final int EOF = 65535;
-    
+
     public static int line = 1; // contador de linhas
-    
+
     private char currentChar = ' '; // caractere lido do arquivo
     private FileReader file; // arquivo fonte
 
@@ -41,7 +41,7 @@ public class Lexer {
         return true;
     }
 
-    public Token scan() throws Exception {
+    public Word scan() throws Exception {
         // TRASH
         for (;; readCurrentChar()) {
 
@@ -78,12 +78,12 @@ public class Lexer {
             }
 
             if (isFloat) {
-                return new Number(Float.parseFloat(lexeme.toString()), Tag.CONST_FLOAT);
+                return new Word(lexeme.toString(), Tag.CONST_FLOAT);
             } else {
                 if (hasDot) {
-                    return new Token(Tag.INVALID_TOKEN);
+                    return new Word(lexeme.toString(), Tag.INVALID_TOKEN);
                 }
-                return new Number(Integer.parseInt(lexeme.toString()), Tag.CONST_INT);
+                return new Word(lexeme.toString(), Tag.CONST_INT);
             }
         }
 
@@ -103,7 +103,7 @@ public class Lexer {
                 return new Word(s, t.getTag()); // palavra já existe na HashTable
             else {
                 Word w = new Word(s, Tag.ID);
-                symbolTableInfos.put(s, w.getTag());
+                // symbolTableInfos.put(s, w);
                 return w;
             }
         }
@@ -112,33 +112,33 @@ public class Lexer {
         switch (this.currentChar) {
             case '=':
                 if (readCurrentChar('='))
-                    return new Token(Tag.EQUALS);
+                    return new Word("=", Tag.EQUALS);
                 else
-                    return new Token(Tag.ASSIGN);
+                    return new Word("==", Tag.ASSIGN);
             case '!':
                 if (readCurrentChar('='))
-                    return new Token(Tag.NOT_EQUALS);
+                    return new Word("!=", Tag.NOT_EQUALS);
                 else
-                    return new Token(Tag.NOT);
+                    return new Word("!", Tag.NOT);
             case '>':
                 if (readCurrentChar('='))
-                    return new Token(Tag.GREATER_EQ);
+                    return new Word(">=", Tag.GREATER_EQ);
                 else
-                    return new Token(Tag.GREATER);
+                    return new Word(">", Tag.GREATER);
             case '<':
                 if (readCurrentChar('='))
-                    return new Token(Tag.LOWER_EQ);
+                    return new Word("<=", Tag.LOWER_EQ);
                 else
-                    return new Token(Tag.LOWER);
+                    return new Word("<", Tag.LOWER);
             case '+':
                 readCurrentChar();
-                return new Token(Tag.ADD);
+                return new Word("+", Tag.ADD);
             case '-':
                 readCurrentChar();
-                return new Token(Tag.SUB);
+                return new Word("-", Tag.SUB);
             case '*':
                 readCurrentChar();
-                return new Token(Tag.MUL);
+                return new Word("*", Tag.MUL);
             case '/':
                 readCurrentChar();
 
@@ -173,37 +173,36 @@ public class Lexer {
                     return scan();
                 }
 
-                return new Token(Tag.DIV);
+                return new Word("/", Tag.DIV);
             case '&':
                 if (readCurrentChar('&'))
-                    return new Token(Tag.AND);
+                    return new Word("&&", Tag.INVALID_TOKEN);
                 else
-                    return new Token(Tag.INVALID_TOKEN);
+                    return new Word("&", Tag.INVALID_TOKEN);
             case '|':
                 if (readCurrentChar('|'))
-                    return new Token(Tag.OR);
+                    return new Word("||", Tag.OR);
                 else
-                    return new Token(Tag.INVALID_TOKEN);
+                    return new Word("|", Tag.INVALID_TOKEN);
             case '.':
                 readCurrentChar();
-                return new Token(Tag.DOT);
+                return new Word(".", Tag.DOT);
             case ',':
                 readCurrentChar();
-                return new Token(Tag.COMMA);
+                return new Word(",", Tag.COMMA);
             case ';':
                 readCurrentChar();
-                return new Token(Tag.SEMI_COLON);
-
+                return new Word(";", Tag.SEMI_COLON);
             case ':':
                 readCurrentChar();
-                return new Token(Tag.COLON);
+                return new Word(":", Tag.COLON);
             case '(':
                 readCurrentChar();
-                return new Token(Tag.OPEN_PAR);
+                return new Word("(", Tag.OPEN_PAR);
 
             case ')':
                 readCurrentChar();
-                return new Token(Tag.CLOSE_PAR);
+                return new Word(")", Tag.CLOSE_PAR);
 
             case '{':
                 Boolean readString = true;
@@ -216,7 +215,7 @@ public class Lexer {
                         readString = false;
                     if (currentChar == ((char) EOF)) {
                         new CompilerException("String mal formatada.", line);
-                        return new Token(Tag.END_OF_FILE);
+                        return new Word("EOF", Tag.END_OF_FILE);
                     }
                 }
                 String s = str.toString();
@@ -234,24 +233,38 @@ public class Lexer {
                     currentChar = ' ';
                     return new Word(Character.toString(value), Tag.CONST_CHAR);
                 } else {
-                    Token t = new Token(Tag.NOT_EXPECTED);
-                    return t;
+                    Word w = new Word(Character.toString(value), Tag.INVALID_TOKEN);
+                    return w;
                 }
             }
         }
 
         // EOF
         if (this.currentChar == ((char) EOF)) {
-            return new Token(Tag.END_OF_FILE);
+            return new Word("EOF", Tag.END_OF_FILE);
         }
 
         // OTHERS
-        Token t = new Token(Tag.NOT_EXPECTED);
+        Word w = new Word(Character.toString(this.currentChar), Tag.INVALID_TOKEN);
         this.currentChar = ' ';
-        return t;
+        return w;
     }
 
     public static int getLine() {
         return line;
     }
+
+    public Table getSymbolTableInfos() {
+        return symbolTableInfos;
+    }
+
+    public void putWordInSymbolTable(Word w) {
+        if (!this.symbolTableInfos.containsString(w.getLexeme())) {
+            this.symbolTableInfos.put(w.getLexeme(), w);
+        }
+
+        // System.out.println("LEXERputWordInSymbolTable: " + w.getLexeme());
+
+    }
+
 }

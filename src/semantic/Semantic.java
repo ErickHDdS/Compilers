@@ -1,16 +1,15 @@
+package semantic;
+
 import symbolTable.Table;
 
 public class Semantic {
-    private Table symbolTable;
-    private HashMap<String, World> symbolTable = new HashMap<String, World>();
+    private Table symbolTableInfos;
 
     public Semantic(Table symbolTable) {
-        this.symbolTable = symbolTable;
+        this.symbolTableInfos = symbolTable;
     }
 
-    public boolean isDeclared(String lexeme) {
-        return symbolTable.isDeclared(lexeme);
+    public boolean containsString(String lexeme) {
+        return symbolTableInfos.containsString(lexeme);
     }
-
-
 }

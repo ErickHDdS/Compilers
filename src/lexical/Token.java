@@ -3,7 +3,7 @@ package lexical;
 public class Token {
 
     private final Tag tag;
-    private Tag typeOfTag;
+    private Types typeOfTag;
 
     public Token(Tag tag) {
         this.tag = tag;
@@ -18,12 +18,11 @@ public class Token {
         return tag;
     }
 
-    public void setTypeOfTag(Tag typeOfTag) {
+    public void setTypeOfTag(Types typeOfTag) {
         this.typeOfTag = typeOfTag;
     }
 
-    public Tag getTypeOfTag() {
+    public Types getTypeOfTag() {
         return typeOfTag;
     }
-
 }
