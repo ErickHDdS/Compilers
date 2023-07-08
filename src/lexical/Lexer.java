@@ -176,7 +176,7 @@ public class Lexer {
                 return new Word("/", Tag.DIV);
             case '&':
                 if (readCurrentChar('&'))
-                    return new Word("&&", Tag.INVALID_TOKEN);
+                    return new Word("&&", Tag.AND);
                 else
                     return new Word("&", Tag.INVALID_TOKEN);
             case '|':
