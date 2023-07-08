@@ -1,8 +1,8 @@
-program teste2 begin
+program teste2 
 
         a, b, c is int;
         d, var_ is float;
-        
+        begin
     teste2 = 1;
     read (a);
     b = a * a;

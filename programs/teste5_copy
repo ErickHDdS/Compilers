@@ -1,10 +1,10 @@
 /* Teste do meu compilador */
 
 program teste5
-    begin
+    
         a, b, c, maior is int;
         outro is char;
-
+begin
         repeat
             write({A});
             read(a);

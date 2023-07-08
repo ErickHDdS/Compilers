@@ -69,13 +69,15 @@ public class Parser {
     }
 
     private void eat(Tag tag) throws Exception {
+        System.out.println("comemos: " + this.currentToken.getLexeme());
 
         boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
         if (isCurrentTokenEqualTag) {
             advance();
         } else {
-            String message = "(EAT) Erro na leitura do token: " + this.currentToken.toString() + "\n Token esperado: "
-                    + tag.toString();
+            String message = "(EAT) Erro na leitura do token: " + this.currentToken.toString();
+            // + "\n Token esperado: "
+            // + tag.toString();
             this.throwCompilerException(message);
         }
     }
@@ -95,7 +97,7 @@ public class Parser {
     // program ::= program identifier begin [decl-list] stmt-list end "."
     public void program() throws Exception {
         if (debug) {
-            System.out.println("program ::= program identifier begin [decl-list] stmt-list end \".\"");
+            System.out.println("program ::= program identifier [decl-list] begin stmt-list end \".\"");
         }
         eat(Tag.PROGRAM);
 
@@ -106,9 +108,8 @@ public class Parser {
             this.throwCompilerException(message);
         }
         identifier();
-
-        eat(Tag.BEGIN);
         declList();
+        eat(Tag.BEGIN);
         stmtList();
         eat(Tag.END);
         this.reservedWordDoesNotHaveSemicolon = Tag.END;
@@ -139,7 +140,6 @@ public class Parser {
         }
         try {
             identList();
-            // printTableWordsInDeclaration();
             eat(Tag.IS);
             Types type = type();
 
@@ -162,14 +162,16 @@ public class Parser {
 
         try {
             // this.lexer.getSymbolTableInfos().printTable();
-            // boolean isInvalid =
-            // this.semantic.containsString(this.currentToken.getLexeme());
-            // if (isInvalid) {
-            // String message = "(PROGRAM) Erro variável já declarada: " +
-            // this.currentToken.getLexeme();
-            // this.throwCompilerException(message);
-            // }
-            wordsInDeclaration.put(this.currentToken.getLexeme(), this.currentToken);
+            boolean isInvalid = this.semantic.containsString(this.currentToken.getLexeme());
+
+            if (this.currentToken.getTag() != Tag.BEGIN) {
+                if (isInvalid) {
+                    String message = "(IDENT-LIST) Variável já declarada: " +
+                            this.currentToken.getLexeme();
+                    this.throwCompilerException(message);
+                }
+                wordsInDeclaration.put(this.currentToken.getLexeme(), this.currentToken);
+            }
             identifier();
             eat(Tag.COMMA);
             identList();
@@ -527,6 +529,9 @@ public class Parser {
             System.out.println("term' ::= mulop factor-a term' | λ");
         }
 
+        System.out.println("entrei TERMLINE");
+        System.out.println(this.currentToken.getLexeme() + " | " + this.currentToken.getTag());
+
         switch (this.currentToken.getTag()) {
             case ID:
             case CONST_INT:
@@ -669,6 +674,8 @@ public class Parser {
         if (debug) {
             System.out.println("mulop ::= \"*\" | \"/\" | \"&&\"");
         }
+
+        System.out.println("entrei MULOP");
 
         switch (this.currentToken.getTag()) {
             case MUL:

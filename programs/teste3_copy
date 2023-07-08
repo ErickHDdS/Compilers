@@ -1,8 +1,8 @@
 program teste3
-    begin
+    
         a, aux is int;
         b is float;
-        
+        begin
         b = 0;
         read(a);
         read(b);

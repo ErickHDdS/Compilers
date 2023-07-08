@@ -1,8 +1,8 @@
 program factorial
 
-  begin
+  
   num, fact is int;
-
+begin
   read(num);
 
   fact = 1;

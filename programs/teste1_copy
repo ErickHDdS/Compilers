@@ -1,9 +1,11 @@
 program teste1
-    begin
-    a, b, a is int;
+    
+    a, b is int;
     result is int;
-    a,x is float;
+    c, x is float;
 
+    begin
+    
     a = 12;
     x = 12.1;
     read (a);
