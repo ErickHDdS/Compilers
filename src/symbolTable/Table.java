@@ -76,6 +76,17 @@ public class Table {
         put(word.getLexeme(), word);
     }
 
+    public Types getElementTypeByKey(String key) {
+        try {
+            Word w = this.table.get(key);
+            return w.getTypeOfTag();
+        } catch (Exception e) {
+            // TO DO: TRATAR ERRO QUANDO NÃO POSSUI O ITEM OU O TIPO DELE NA TABELA
+            System.out.println("ERRO:" + key);
+        }
+        return null;
+    }
+
     public void printTable() {
         for (Map.Entry<String, Word> entry : this.table.entrySet()) {
             String key = entry.getKey();

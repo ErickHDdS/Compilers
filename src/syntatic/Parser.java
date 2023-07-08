@@ -35,25 +35,26 @@ public class Parser {
     }
 
     // TO DO: APAGAR ESTA FUNCAO
-    public void printTableWordsInDeclaration() {
-        for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
-            String key = entry.getKey();
-            Word w = entry.getValue();
-            System.out.println("{" + key + "}" + " --> " + w.getLexeme() + "|" + w.getTag() + "|" + w.getTypeOfTag());
-        }
-    }
+    // public void printTableWordsInDeclaration() {
+    // for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
+    // String key = entry.getKey();
+    // Word w = entry.getValue();
+    // System.out.println("{" + key + "}" + " --> " + w.getLexeme() + "|" +
+    // w.getTag() + "|" + w.getTypeOfTag());
+    // }
+    // }
 
     public void addTypeWordsInDeclarationInTable(Types type) {
         for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
             Word w = entry.getValue();
-
-            // System.out.println("WORD: " + w.getLexeme() + " | " + "TIPO: " +
-            // type.toString());
             lexer.symbolTableInfos.setSetTypeOfTag(w, type);
-
             this.wordsInDeclaration = new HashMap<String, Word>();
-
         }
+    }
+
+    public Types getWordInSymbolTable(String key) {
+        // System.out.println("ENTRANDO NA TABELA: " + key);
+        return lexer.symbolTableInfos.getElementTypeByKey(key);
     }
 
     public Token getCurrentToken() {
@@ -69,8 +70,6 @@ public class Parser {
     }
 
     private void eat(Tag tag) throws Exception {
-        System.out.println("comemos: " + this.currentToken.getLexeme());
-
         boolean isCurrentTokenEqualTag = this.currentToken.getTag().toString().equals(tag.toString());
         if (isCurrentTokenEqualTag) {
             advance();
@@ -232,7 +231,9 @@ public class Parser {
             }
 
         } catch (CompilerException e) {
-            String message = "(STMT LIST) Erro na leitura do token: " + this.currentToken.toString();
+            String message = "(STMT LIST) Erro na leitura do token: " +
+                    this.currentToken.toString() + "\n" +
+                    e.getMessage();
             this.throwCompilerException(message);
         }
     }
@@ -245,13 +246,14 @@ public class Parser {
         }
 
         // Tratamento para a saída de decl-list para stmt-list
-        if (this.lastToken != null && this.lastToken.getTag().toString().equals(Tag.ID.toString())) {
-            // assign-stmt ::= identifier(eat) "=" simple_expr
-            eat(Tag.ASSIGN);
-            simpleExpr();
-            lastToken = null;
-            return;
-        }
+        // if (this.lastToken != null &&
+        // this.lastToken.getTag().toString().equals(Tag.ID.toString())) {
+        // // assign-stmt ::= identifier(eat) "=" simple_expr
+        // eat(Tag.ASSIGN);
+        // simpleExpr(this);
+        // lastToken = null;
+        // return;
+        // }
 
         switch (this.currentToken.getTag()) {
             case ID:
@@ -284,16 +286,14 @@ public class Parser {
             System.out.println("assign-stmt ::= identifier(eat) \"=\" simple_expr");
         }
 
-        // boolean isInvalid =
-        // this.semantic.containsString(this.currentToken.getLexeme());
-        // if (isInvalid) {
-        // String message = "(PROGRAM) Erro variável já declarada: " +
-        // this.currentToken.getLexeme();
-        // this.throwCompilerException(message);
-        // }
+        String lexeme = this.currentToken.getLexeme();
+        Types actualType = getWordInSymbolTable(lexeme);
         identifier();
         eat(Tag.ASSIGN);
-        simpleExpr();
+
+        lexeme = this.currentToken.getLexeme();
+
+        simpleExpr(actualType);
     }
 
     // if-stmt ::= if condition then stmt-list if-stmt’
@@ -338,7 +338,7 @@ public class Parser {
             System.out.println("condition ::= expression");
         }
 
-        expression();
+        expression(null);
     }
 
     // repeat-stmt ::= repeat stmt-list stmt-suffix
@@ -432,7 +432,7 @@ public class Parser {
             case OPEN_PAR:
             case NOT:
             case SUB:
-                simpleExpr();
+                simpleExpr(null);
                 break;
             case LITERAL:
                 literal();
@@ -444,17 +444,17 @@ public class Parser {
     }
 
     // expression ::= simple-expr expression’
-    public void expression() throws Exception {
+    public void expression(Types actualType) throws Exception {
         if (debug) {
             System.out.println("expression ::= simple-expr expression’");
         }
 
-        simpleExpr();
-        expressionLine();
+        simpleExpr(actualType);
+        expressionLine(actualType);
     }
 
     // expression’ ::= relop simple-expr
-    public void expressionLine() throws Exception {
+    public void expressionLine(Types actualType) throws Exception {
         if (debug) {
             System.out.println("expression' ::= relop simple-expr");
         }
@@ -467,7 +467,7 @@ public class Parser {
             case LOWER_EQ:
             case NOT_EQUALS:
                 relop();
-                simpleExpr();
+                simpleExpr(null);
                 break;
             default:
                 break;
@@ -475,17 +475,17 @@ public class Parser {
     }
 
     // simple-expr ::= term simple-expr’
-    public void simpleExpr() throws Exception {
+    public void simpleExpr(Types actualType) throws Exception {
         if (debug) {
             System.out.println("simple-expr ::= term simple-expr'");
         }
 
-        term();
-        simpleExprLine();
+        term(actualType);
+        simpleExprLine(actualType);
     }
 
     // simple-expr’ ::= simple-expr addop simple-expr’ | λ
-    public void simpleExprLine() throws Exception {
+    public void simpleExprLine(Types actualType) throws Exception {
         if (debug) {
             System.out.println("simple-expr' ::= simple-expr addop simple-expr' | λ");
         }
@@ -498,15 +498,15 @@ public class Parser {
             case SINGLE_QUOTE:
             case OPEN_PAR:
             case NOT:
-                simpleExpr();
+                simpleExpr(actualType);
                 addop();
-                simpleExprLine();
+                simpleExprLine(actualType);
                 break;
             case OR:
             case ADD:
             case SUB:
                 addop();
-                expression();
+                expression(actualType);
                 break;
             default:
                 break;
@@ -514,23 +514,20 @@ public class Parser {
     }
 
     // term ::= factor-a term’
-    public void term() throws Exception {
+    public void term(Types actualType) throws Exception {
         if (debug) {
             System.out.println("term ::= factor-a term'");
         }
 
-        factorA();
-        termLine();
+        factorA(actualType);
+        termLine(actualType);
     }
 
     // term’ ::= mulop factor-a term’ | λ
-    public void termLine() throws Exception {
+    public void termLine(Types actualType) throws Exception {
         if (debug) {
             System.out.println("term' ::= mulop factor-a term' | λ");
         }
-
-        System.out.println("entrei TERMLINE");
-        System.out.println(this.currentToken.getLexeme() + " | " + this.currentToken.getTag());
 
         switch (this.currentToken.getTag()) {
             case ID:
@@ -545,8 +542,8 @@ public class Parser {
             case MUL:
             case DIV:
                 mulop();
-                factorA();
-                termLine();
+                factorA(actualType);
+                termLine(actualType);
                 break;
             default:
                 break;
@@ -554,7 +551,7 @@ public class Parser {
     }
 
     // factor-a ::= factor |"!" factor | "-" factor
-    public void factorA() throws Exception {
+    public void factorA(Types actualType) throws Exception {
         if (debug) {
             System.out.println("factor-a ::= factor |\"!\" factor | \"-\" factor");
         }
@@ -566,15 +563,15 @@ public class Parser {
             case CONST_CHAR:
             case SINGLE_QUOTE:
             case OPEN_PAR:
-                factor();
+                factor(actualType);
                 break;
             case NOT:
                 eat(Tag.NOT);
-                factor();
+                factor(null);
                 break;
             case SUB:
                 eat(Tag.SUB);
-                factor();
+                factor(null);
                 break;
             default:
                 String message = "(FACTOR-A) Token não esperado: " + this.currentToken.toString();
@@ -583,30 +580,45 @@ public class Parser {
     }
 
     // factor ::= identifier | constant | "(" expression ")"
-    public void factor() throws Exception {
+    public void factor(Types actualTypeExpected) throws Exception {
         if (debug) {
             System.out.println("factor ::= identifier | constant | \"(\" expression \")\"");
         }
+        boolean isValid;
 
         switch (this.currentToken.getTag()) {
             case ID:
-                // boolean isInvalid =
-                // this.semantic.containsString(this.currentToken.getLexeme());
-                // if (isInvalid) {
-                // String message = "(PROGRAM) Erro variável já declarada: " +
-                // this.currentToken.getLexeme();
-                // this.throwCompilerException(message);
-                // }
+                Types actualType = getWordInSymbolTable(this.currentToken.getLexeme());
+
+                if (actualTypeExpected != null) {
+                    isValid = actualType.toString().equals(actualTypeExpected.toString());
+
+                    if (!isValid) {
+                        String message = "(FACTOR) Erro na atribuição de identificadores, tipos incompatíveis";
+                        this.throwCompilerException(message);
+                    }
+                }
                 identifier();
                 break;
             case CONST_INT:
             case CONST_FLOAT:
             case CONST_CHAR:
+                if (actualTypeExpected != null) {
+                    Tag actualTag = actualTypeExpected == Types.INTEGER ? Tag.CONST_INT
+                            : (actualTypeExpected == Types.FLOAT ? Tag.CONST_FLOAT : Tag.CONST_CHAR);
+
+                    isValid = this.currentToken.getTag().toString().equals(actualTag.toString());
+
+                    if (!isValid) {
+                        String message = "(FACTOR) Erro na atribuição de constantes, tipos incompatíveis";
+                        this.throwCompilerException(message);
+                    }
+                }
                 constant();
                 break;
             case OPEN_PAR:
                 eat(Tag.OPEN_PAR);
-                expression();
+                expression(actualTypeExpected);
                 eat(Tag.CLOSE_PAR);
                 break;
 
@@ -674,8 +686,6 @@ public class Parser {
         if (debug) {
             System.out.println("mulop ::= \"*\" | \"/\" | \"&&\"");
         }
-
-        System.out.println("entrei MULOP");
 
         switch (this.currentToken.getTag()) {
             case MUL:
