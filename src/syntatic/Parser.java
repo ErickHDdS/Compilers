@@ -310,8 +310,6 @@ public class Parser {
             System.out.println("condition ::= expression");
         }
 
-        System.out.println("lex : " + this.currentToken.getLexeme() + " - "
-                + semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme()));
         expression(semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme()));
     }
 
