@@ -3,7 +3,7 @@
 Este repositório contém um compilador Java para uma linguagem de programação especificada. A linguagem de programação é definida pela gramática abaixo:
 
 ```
-program ::= program identifier begin [decl-list] stmt-list end "."
+program ::= program identifier [decl-list] begin stmt-list end "."
 
 decl-list ::= decl ";" { decl ";"}
 
