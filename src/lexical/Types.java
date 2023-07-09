@@ -5,4 +5,6 @@ public enum Types {
     FLOAT, // decimal
     CHAR, // char
     STRING, // literal
+
+    PROGRAM,
 }

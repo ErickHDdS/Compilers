@@ -3,9 +3,11 @@ package symbolTable;
 import java.util.HashMap;
 import java.util.Map;
 
+import lexical.Lexer;
 import lexical.Tag;
 import lexical.Types;
 import lexical.Word;
+import utils.CompilerException;
 
 public class Table {
     public Map<String, Word> table;
@@ -77,14 +79,16 @@ public class Table {
     }
 
     public Types getElementTypeByKey(String key) {
-        try {
-            Word w = this.table.get(key);
-            return w.getTypeOfTag();
-        } catch (Exception e) {
-            // TO DO: TRATAR ERRO QUANDO NÃO POSSUI O ITEM OU O TIPO DELE NA TABELA
-            System.out.println("ERRO:" + key);
-        }
-        return null;
+        // try {
+        Word w = this.table.get(key);
+        return w.getTypeOfTag();
+        // }
+        // catch (Exception e) {
+
+        // // TO DO: TRATAR ERRO QUANDO NÃO POSSUI O ITEM OU O TIPO DELE NA TABELA
+        // System.out.println("ERRO:" + key);
+        // }
+        // return null;
     }
 
     public void printTable() {

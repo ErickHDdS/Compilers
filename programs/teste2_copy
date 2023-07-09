@@ -1,14 +1,14 @@
 program teste2 
 
         a, b, c is int;
-        d, var_ is float;
+        d, var_, val is float;
         begin
-    teste2 = 1;
+    a = 1;
     read (a);
     b = a * a;
     c = b + a/2 * (35/b);
     write (c);
     val = 34.2;
-    c = val + 2.2 + a;
+    var_ = val + 2.2;
     write (val);
 end.

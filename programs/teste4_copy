@@ -2,8 +2,7 @@ program teste4
 
 /* Teste4 do meu compilador */
 
-    pontuacao, pontuacaoMaxina, disponibilidade is int;
-    pontuacaoMinima is char;
+    pontuacaoMinima, pontuacao, pontuacaoMaxina, disponibilidade is int;
 begin
     pontuacaoMinima = 50;
     pontuacaoMaxima = 100;

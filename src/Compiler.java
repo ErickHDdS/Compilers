@@ -27,6 +27,8 @@ public class Compiler {
                 parser.programLine();
             } while (parser.getCurrentToken().getTag() != Tag.END_OF_FILE);
 
+            System.out.println("Analise concluída com sucesso.");
+
             // lexer.symbolTableInfos.printTable();
             // System.out.println("*********************");
             // parser.getSymbolTable().printTable();

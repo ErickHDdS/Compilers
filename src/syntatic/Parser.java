@@ -25,8 +25,6 @@ public class Parser {
     private boolean debug;
     private Semantic semantic;
 
-    private Map<String, Word> wordsInDeclaration = new HashMap<String, Word>();
-
     public Parser(Lexer lexer, boolean debug) throws Exception {
         this.lexer = lexer;
         this.debug = debug;
@@ -44,17 +42,8 @@ public class Parser {
     // }
     // }
 
-    public void addTypeWordsInDeclarationInTable(Types type) {
-        for (Map.Entry<String, Word> entry : this.wordsInDeclaration.entrySet()) {
-            Word w = entry.getValue();
-            lexer.symbolTableInfos.setSetTypeOfTag(w, type);
-            this.wordsInDeclaration = new HashMap<String, Word>();
-        }
-    }
-
-    public Types getWordInSymbolTable(String key) {
-        // System.out.println("ENTRANDO NA TABELA: " + key);
-        return lexer.symbolTableInfos.getElementTypeByKey(key);
+    public void putWordInSymbolTable(String key, Word word) {
+        lexer.symbolTableInfos.put(key, word);
     }
 
     public Token getCurrentToken() {
@@ -106,6 +95,10 @@ public class Parser {
                     this.currentToken.getLexeme();
             this.throwCompilerException(message);
         }
+
+        semantic.addWordInDeclaration(this.currentToken.getLexeme(), this.currentToken);
+        semantic.addTypeWordsInDeclarationInTable(this.currentToken.getLexeme(), Types.PROGRAM);
+
         identifier();
         declList();
         eat(Tag.BEGIN);
@@ -142,7 +135,7 @@ public class Parser {
             eat(Tag.IS);
             Types type = type();
 
-            addTypeWordsInDeclarationInTable(type);
+            semantic.addTypeWordsInDeclarationInTable(this.lastToken.getLexeme(), type);
 
             // identifier.setTypeOfTag(type);
         } catch (CompilerException e) {
@@ -169,7 +162,7 @@ public class Parser {
                             this.currentToken.getLexeme();
                     this.throwCompilerException(message);
                 }
-                wordsInDeclaration.put(this.currentToken.getLexeme(), this.currentToken);
+                semantic.addWordInDeclaration(this.currentToken.getLexeme(), this.currentToken);
             }
             identifier();
             eat(Tag.COMMA);
@@ -287,7 +280,12 @@ public class Parser {
         }
 
         String lexeme = this.currentToken.getLexeme();
-        Types actualType = getWordInSymbolTable(lexeme);
+        Types actualType = semantic.getWordInSymbolTable(lexeme);
+        if (actualType == null) {
+            String message = "Variável não encontrada na tabela de símbolos";
+            throwCompilerException(message);
+        }
+
         identifier();
         eat(Tag.ASSIGN);
 
@@ -338,6 +336,7 @@ public class Parser {
             System.out.println("condition ::= expression");
         }
 
+        System.out.println(semantic.getWordInSymbolTable(this.currentToken.getLexeme()));
         expression(null);
     }
 
@@ -588,7 +587,7 @@ public class Parser {
 
         switch (this.currentToken.getTag()) {
             case ID:
-                Types actualType = getWordInSymbolTable(this.currentToken.getLexeme());
+                Types actualType = semantic.getWordInSymbolTable(this.currentToken.getLexeme());
 
                 if (actualTypeExpected != null) {
                     isValid = actualType.toString().equals(actualTypeExpected.toString());
