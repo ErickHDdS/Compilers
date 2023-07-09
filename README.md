@@ -84,7 +84,7 @@ O compilador implementado neste repositório é capaz de realizar as seguintes f
 
 - [x] Análise léxica
 - [x] Análise sintática
-- [ ] Análise semântica
+- [x] Análise semântica
 - [ ] Geração de código
 
 ## Como utilizar
