@@ -100,5 +100,4 @@ public class Table {
     public void throwCompilerException(String message) throws Exception {
         throw new CompilerException(message, Lexer.getLine());
     }
-
 }

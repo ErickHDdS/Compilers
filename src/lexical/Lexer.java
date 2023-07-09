@@ -262,9 +262,6 @@ public class Lexer {
         if (!this.symbolTableInfos.containsString(w.getLexeme())) {
             this.symbolTableInfos.put(w.getLexeme(), w);
         }
-
-        // System.out.println("LEXERputWordInSymbolTable: " + w.getLexeme());
-
     }
 
 }
