@@ -1,9 +1,8 @@
-program teste2 begin
-
-        a, b, c is int;
-        d, var_ is float;
-        
-    teste2 = 1;
+program teste2 
+    a, b, c is int;
+    d, var_ is float;        
+begin
+    a = 1;
     read (a);
     b = a * a;
     c = b + a/2 * (35/b);
@@ -11,4 +10,4 @@ program teste2 begin
     val = 34.2;
     c = val + 2.2 + a;
     write (val);
-end.
+end

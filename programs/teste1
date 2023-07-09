@@ -1,9 +1,8 @@
 program teste1
-    begin
-    a, b is int;
+    a, b, c is int;
     result is int;
-    a,x is float;
-
+    x is float;    
+begin
     a = 12;
     x = 12.1;
     read (a);
@@ -12,5 +11,4 @@ program teste1
     result = (a*b + 1) / (c+2);
     write ({Resultado: });
     write (result);
-
 end.

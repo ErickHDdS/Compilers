@@ -1,6 +1,6 @@
 program order
-  begin
   num1, num2, temp is int;
+begin
 
   read(num1);
   read(num2);
