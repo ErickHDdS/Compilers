@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import symbolTable.Table;
 import lexical.Word;
+import lexical.Tag;
 import lexical.Types;
 
 public class Semantic {
     private Table symbolTableInfos;
     private Map<String, Word> wordsInDeclaration;
+    private Types typeInExpression;
+    private Tag tagInExpression;
 
     public Semantic(Table symbolTable) {
         this.symbolTableInfos = symbolTable;
@@ -31,8 +34,23 @@ public class Semantic {
         }
     }
 
-    public Types getWordInSymbolTable(String key) {
-        // System.out.println("ENTRANDO NA TABELA: " + key);
+    public Types getTypeWordInSymbolTable(String key) throws Exception {
         return this.symbolTableInfos.getElementTypeByKey(key);
+    }
+
+    public Types getTypeInExpression() {
+        return typeInExpression;
+    }
+
+    public void setTypeInExpression(Types typeInExpression) {
+        this.typeInExpression = typeInExpression;
+    }
+
+    public Tag getTagInExpression() {
+        return tagInExpression;
+    }
+
+    public void setTagInExpression(Tag tagInExpression) {
+        this.tagInExpression = tagInExpression;
     }
 }

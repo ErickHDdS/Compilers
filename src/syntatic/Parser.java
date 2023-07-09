@@ -280,7 +280,7 @@ public class Parser {
         }
 
         String lexeme = this.currentToken.getLexeme();
-        Types actualType = semantic.getWordInSymbolTable(lexeme);
+        Types actualType = semantic.getTypeWordInSymbolTable(lexeme);
         if (actualType == null) {
             String message = "Variável não encontrada na tabela de símbolos";
             throwCompilerException(message);
@@ -336,8 +336,9 @@ public class Parser {
             System.out.println("condition ::= expression");
         }
 
-        System.out.println(semantic.getWordInSymbolTable(this.currentToken.getLexeme()));
-        expression(null);
+        System.out.println("lex : " + this.currentToken.getLexeme() + " - "
+                + semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme()));
+        expression(semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme()));
     }
 
     // repeat-stmt ::= repeat stmt-list stmt-suffix
@@ -587,13 +588,18 @@ public class Parser {
 
         switch (this.currentToken.getTag()) {
             case ID:
-                Types actualType = semantic.getWordInSymbolTable(this.currentToken.getLexeme());
+                Types actualType = semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme());
 
                 if (actualTypeExpected != null) {
                     isValid = actualType.toString().equals(actualTypeExpected.toString());
-
                     if (!isValid) {
                         String message = "(FACTOR) Erro na atribuição de identificadores, tipos incompatíveis";
+                        this.throwCompilerException(message);
+                    }
+                } else if (semantic.getTypeInExpression() != null) {
+                    isValid = actualType.toString().equals(semantic.getTypeInExpression().toString());
+                    if (!isValid) {
+                        String message = "(FACTOR) Erro na validação de identificadores, tipos incompatíveis";
                         this.throwCompilerException(message);
                     }
                 }
@@ -612,12 +618,31 @@ public class Parser {
                         String message = "(FACTOR) Erro na atribuição de constantes, tipos incompatíveis";
                         this.throwCompilerException(message);
                     }
+                } else if (semantic.getTagInExpression() != null) {
+
+                    Tag actualTag = semantic.getTypeInExpression() == Types.INTEGER ? Tag.CONST_INT
+                            : (semantic.getTypeInExpression() == Types.FLOAT ? Tag.CONST_FLOAT : Tag.CONST_CHAR);
+
+                    isValid = this.currentToken.getTag().toString().equals(actualTag.toString());
+
+                    if (!isValid) {
+                        String message = "(FACTOR) Erro na validação de constantes, tipos incompatíveis";
+                        this.throwCompilerException(message);
+                    }
                 }
                 constant();
                 break;
             case OPEN_PAR:
                 eat(Tag.OPEN_PAR);
+                try {
+                    semantic.setTypeInExpression(semantic.getTypeWordInSymbolTable(this.currentToken.getLexeme()));
+                    semantic.setTagInExpression(this.currentToken.getTag());
+
+                } catch (Exception e) {
+                }
                 expression(actualTypeExpected);
+                semantic.setTypeInExpression(null);
+                semantic.setTagInExpression(null);
                 eat(Tag.CLOSE_PAR);
                 break;
 

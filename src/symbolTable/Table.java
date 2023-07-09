@@ -78,17 +78,15 @@ public class Table {
         put(word.getLexeme(), word);
     }
 
-    public Types getElementTypeByKey(String key) {
-        // try {
-        Word w = this.table.get(key);
-        return w.getTypeOfTag();
-        // }
-        // catch (Exception e) {
-
-        // // TO DO: TRATAR ERRO QUANDO NÃO POSSUI O ITEM OU O TIPO DELE NA TABELA
-        // System.out.println("ERRO:" + key);
-        // }
-        // return null;
+    public Types getElementTypeByKey(String key) throws Exception {
+        try {
+            Word w = this.table.get(key);
+            return w.getTypeOfTag();
+        } catch (Exception e) {
+            String message = "Elemento não encontrado";
+            throwCompilerException(message);
+        }
+        return null;
     }
 
     public void printTable() {
@@ -97,6 +95,10 @@ public class Table {
             Word w = entry.getValue();
             System.out.println("{" + key + "}" + " --> " + w.getLexeme() + "|" + w.getTag() + "|" + w.getTypeOfTag());
         }
+    }
+
+    public void throwCompilerException(String message) throws Exception {
+        throw new CompilerException(message, Lexer.getLine());
     }
 
 }
